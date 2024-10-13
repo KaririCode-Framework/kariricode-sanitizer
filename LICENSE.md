@@ -1,1 +1,0 @@
-# KaririCode Frameqork: Sanitizer Component
