@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22bf2f30b1441f6fdea16b4723c0184a",
+    "content-hash": "8388d111e06717bf1de152e1b2d19036",
     "packages": [
         {
             "name": "kariricode/contract",
-            "version": "v2.6.3",
+            "version": "v2.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
-                "reference": "5d98b009c7c5c20dd63b4440405ac81f93544e7d"
+                "reference": "253787b27e8fa170ef5e2b12e69a20557701a899"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/5d98b009c7c5c20dd63b4440405ac81f93544e7d",
-                "reference": "5d98b009c7c5c20dd63b4440405ac81f93544e7d",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/253787b27e8fa170ef5e2b12e69a20557701a899",
+                "reference": "253787b27e8fa170ef5e2b12e69a20557701a899",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-contract"
             },
-            "time": "2024-10-10T21:05:49+00:00"
+            "time": "2024-10-15T16:33:53+00:00"
         },
         {
             "name": "kariricode/data-structure",
@@ -141,6 +141,129 @@
                 "source": "https://github.com/KaririCode-Framework/kariricode-data-structure"
             },
             "time": "2024-10-10T22:37:23+00:00"
+        },
+        {
+            "name": "kariricode/processor-pipeline",
+            "version": "v1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline.git",
+                "reference": "07c645a1c45f47ffd748e6bb8231806b465bd7bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-processor-pipeline/zipball/07c645a1c45f47ffd748e6bb8231806b465bd7bc",
+                "reference": "07c645a1c45f47ffd748e6bb8231806b465bd7bc",
+                "shasum": ""
+            },
+            "require": {
+                "kariricode/contract": "^2.7",
+                "kariricode/data-structure": "^1.1",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "enlightn/security-checker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.51",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^11.0",
+                "squizlabs/php_codesniffer": "^3.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KaririCode\\ProcessorPipeline\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Walmir Silva",
+                    "email": "community@kariricode.org"
+                }
+            ],
+            "description": "A flexible and extensible processor pipeline component for the KaririCode framework. Enables the creation of modular, configurable processing chains for data transformation, validation, and sanitization tasks",
+            "homepage": "https://kariricode.org",
+            "keywords": [
+                "KaririCode",
+                "configurable",
+                "data processing",
+                "modular",
+                "php",
+                "pipeline",
+                "processor"
+            ],
+            "support": {
+                "issues": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline/issues",
+                "source": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline"
+            },
+            "time": "2024-10-15T14:03:33+00:00"
+        },
+        {
+            "name": "kariricode/property-inspector",
+            "version": "v1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KaririCode-Framework/kariricode-property-inspector.git",
+                "reference": "30c6e85ac70fb3351ce16c05ba7ec0baf6ab98f0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/30c6e85ac70fb3351ce16c05ba7ec0baf6ab98f0",
+                "reference": "30c6e85ac70fb3351ce16c05ba7ec0baf6ab98f0",
+                "shasum": ""
+            },
+            "require": {
+                "kariricode/contract": "^2.7",
+                "kariricode/processor-pipeline": "^1.1",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "enlightn/security-checker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.51",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^11.0",
+                "squizlabs/php_codesniffer": "^3.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KaririCode\\PropertyInspector\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Walmir Silva",
+                    "email": "community@kariricode.org"
+                }
+            ],
+            "description": "A robust and flexible data sanitization component for PHP, part of the KaririCode Framework, utilizing configurable processors and native functions.",
+            "homepage": "https://kariricode.org",
+            "keywords": [
+                "attribute",
+                "dynamic-analysis",
+                "framework",
+                "inspection",
+                "kariri-code",
+                "metadata",
+                "normalization",
+                "object-properties",
+                "php8",
+                "property-inspector",
+                "reflection",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/KaririCode-Framework/kariricode-property-inspector/issues",
+                "source": "https://github.com/KaririCode-Framework/kariricode-property-inspector"
+            },
+            "time": "2024-10-15T16:42:44+00:00"
         }
     ],
     "packages-dev": [
@@ -5047,12 +5170,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

@@ -23,19 +23,18 @@
   ],
   "require": {
     "php": "^8.3",
-    "kariricode/data-structure": "^1.0"
+    "kariricode/contract": "^2.7",
+    "kariricode/processor-pipeline": "^1.1",
+    "kariricode/property-inspector": "^1.0"
   },
   "autoload": {
     "psr-4": {
-      "KaririCode\\Dotenv\\": "src"
-    },
-    "files": [
-      "src/functions.php"
-    ]
+      "KaririCode\\Sanitizer\\": "src"
+    }
   },
   "autoload-dev": {
     "psr-4": {
-      "KaririCode\\Dotenv\\Tests\\": "tests"
+      "KaririCode\\Sanitizer\\Tests\\": "tests"
     }
   },
   "require-dev": {
