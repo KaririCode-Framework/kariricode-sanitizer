@@ -82,7 +82,7 @@ $autoSanitizer = new Sanitizer($registry);
 // Create a UserInput object with potentially unsafe data
 $userInput = new UserInput();
 $userInput->setName("  John Doe <script>alert('xss')</script>  ");
-$userInput->setEmail(' john.doe@example..com ');
+$userInput->setEmail(' john.doe@example#.com ');
 $userInput->setAge(' 25 years old ');
 $userInput->setBio("<p>Hello, I'm John!</p><script>alert('bio')</script>");
 

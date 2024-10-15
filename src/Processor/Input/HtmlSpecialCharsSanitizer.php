@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace KaririCode\Sanitizer\Processor;
+namespace KaririCode\Sanitizer\Processor\Input;
 
-class XssSanitizer extends AbstractSanitizerProcessor
+use KaririCode\Sanitizer\Processor\AbstractSanitizerProcessor;
+
+class HtmlSpecialCharsSanitizer extends AbstractSanitizerProcessor
 {
     public function process(mixed $input): string
     {

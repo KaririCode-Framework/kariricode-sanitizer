@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace KaririCode\Sanitizer\Processor\Remover;
+namespace KaririCode\Sanitizer\Processor\Input;
 
 use KaririCode\Contract\Processor\ConfigurableProcessor;
 use KaririCode\Sanitizer\Processor\AbstractSanitizerProcessor;
 
-final class HtmlTagRemover extends AbstractSanitizerProcessor implements ConfigurableProcessor
+class StripTagsSanitizer extends AbstractSanitizerProcessor implements ConfigurableProcessor
 {
     private array $allowedTags = [];
 
@@ -20,6 +20,8 @@ final class HtmlTagRemover extends AbstractSanitizerProcessor implements Configu
 
     public function process(mixed $input): string
     {
-        return strip_tags($this->guardAgainstNonString($input), $this->allowedTags);
+        $input = $this->guardAgainstNonString($input);
+
+        return strip_tags($input, $this->allowedTags);
     }
 }
