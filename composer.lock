@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "kariricode/contract",
-            "version": "v2.7.8",
+            "version": "v2.7.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
-                "reference": "43d56250770789e08b8573491d3abdee2c31e9b3"
+                "reference": "2174dd69812320a2ed88ab7ed0679eb6a42399fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/43d56250770789e08b8573491d3abdee2c31e9b3",
-                "reference": "43d56250770789e08b8573491d3abdee2c31e9b3",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/2174dd69812320a2ed88ab7ed0679eb6a42399fb",
+                "reference": "2174dd69812320a2ed88ab7ed0679eb6a42399fb",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-contract"
             },
-            "time": "2024-10-18T17:00:16+00:00"
+            "time": "2024-10-18T21:09:48+00:00"
         },
         {
             "name": "kariricode/data-structure",
