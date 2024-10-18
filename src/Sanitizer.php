@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace KaririCode\Sanitizer;
 
 use KaririCode\Contract\Processor\ProcessorRegistry;
@@ -9,9 +7,6 @@ use KaririCode\Contract\Sanitizer\Sanitizer as SanitizerContract;
 use KaririCode\ProcessorPipeline\ProcessorBuilder;
 use KaririCode\PropertyInspector\AttributeAnalyzer;
 use KaririCode\PropertyInspector\AttributeHandler;
-use KaririCode\PropertyInspector\Contract\PropertyAttributeHandler;
-use KaririCode\PropertyInspector\Contract\PropertyChangeApplier;
-use KaririCode\PropertyInspector\Exception\PropertyInspectionException;
 use KaririCode\PropertyInspector\Utility\PropertyInspector;
 use KaririCode\Sanitizer\Attribute\Sanitize;
 
@@ -21,7 +16,7 @@ class Sanitizer implements SanitizerContract
 
     private ProcessorBuilder $builder;
     private PropertyInspector $propertyInspector;
-    private PropertyAttributeHandler&PropertyChangeApplier $attributeHandler;
+    private AttributeHandler $attributeHandler;
 
     public function __construct(private readonly ProcessorRegistry $registry)
     {
@@ -34,13 +29,14 @@ class Sanitizer implements SanitizerContract
 
     public function sanitize(mixed $object): array
     {
-        try {
-            $sanitizedValues = $this->propertyInspector->inspect($object, $this->attributeHandler);
-            $this->attributeHandler->applyChanges($object);
+        $this->propertyInspector->inspect($object, $this->attributeHandler);
+        $this->attributeHandler->applyChanges($object);
 
-            return $sanitizedValues;
-        } catch (PropertyInspectionException $e) {
-            return [];
-        }
+        return [
+            'sanitizedValues' => $this->attributeHandler->getProcessedValues(),
+            'messages' => $this->attributeHandler->getProcessingMessages(),
+            'errors' => $this->attributeHandler->getProcessingErrors(),
+            'object' => $object,
+        ];
     }
 }

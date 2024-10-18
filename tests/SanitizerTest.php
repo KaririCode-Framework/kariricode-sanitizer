@@ -25,24 +25,24 @@ final class SanitizerTest extends TestCase
     public function testSanitizeProcessesObjectProperties(): void
     {
         $testObject = new class {
-            #[Sanitize(sanitizers: ['trim'])]
-            public string $name = '  John Doe  ';
+            #[Sanitize(processors: ['trim'])]
+            public string $name = '  Walmir Silva  ';
 
-            #[Sanitize(sanitizers: ['email'])]
-            public string $email = 'john.doe@example..com';
+            #[Sanitize(processors: ['email'])]
+            public string $email = 'walmir.silva@example..com';
         };
 
         $trimProcessor = $this->createMock(Processor::class);
         $trimProcessor->expects($this->once())
             ->method('process')
-            ->with('  John Doe  ')
-            ->willReturn('John Doe');
+            ->with('  Walmir Silva  ')
+            ->willReturn('Walmir Silva');
 
         $emailProcessor = $this->createMock(Processor::class);
         $emailProcessor->expects($this->once())
             ->method('process')
-            ->with('john.doe@example..com')
-            ->willReturn('john.doe@example.com');
+            ->with('walmir.silva@example..com')
+            ->willReturn('walmir.silva@example.com');
 
         $this->registry->expects($this->exactly(2))
             ->method('get')
@@ -53,18 +53,18 @@ final class SanitizerTest extends TestCase
 
         $sanitizedValues = $this->sanitizer->sanitize($testObject);
 
-        $this->assertSame('John Doe', $testObject->name);
-        $this->assertSame('john.doe@example.com', $testObject->email);
-        $this->assertArrayHasKey('name', $sanitizedValues);
-        $this->assertArrayHasKey('email', $sanitizedValues);
-        $this->assertSame(['John Doe'], $sanitizedValues['name']);
-        $this->assertSame(['john.doe@example.com'], $sanitizedValues['email']);
+        $this->assertSame('Walmir Silva', $testObject->name);
+        $this->assertSame('walmir.silva@example.com', $testObject->email);
+        $this->assertArrayHasKey('name', $sanitizedValues['sanitizedValues']);
+        $this->assertArrayHasKey('email', $sanitizedValues['sanitizedValues']);
+        $this->assertSame('Walmir Silva', $sanitizedValues['sanitizedValues']['name']['value']);
+        $this->assertSame('walmir.silva@example.com', $sanitizedValues['sanitizedValues']['email']['value']);
     }
 
     public function testSanitizeHandlesNonProcessableAttributes(): void
     {
         $testObject = new class {
-            #[Sanitize(sanitizers: ['trim'])]
+            #[Sanitize(processors: ['trim'])]
             public string $processable = '  trim me  ';
 
             public string $nonProcessable = 'leave me alone';
@@ -85,14 +85,14 @@ final class SanitizerTest extends TestCase
 
         $this->assertSame('trim me', $testObject->processable);
         $this->assertSame('leave me alone', $testObject->nonProcessable);
-        $this->assertArrayHasKey('processable', $sanitizedValues);
-        $this->assertArrayNotHasKey('nonProcessable', $sanitizedValues);
+        $this->assertArrayHasKey('processable', $sanitizedValues['sanitizedValues']);
+        $this->assertArrayNotHasKey('nonProcessable', $sanitizedValues['sanitizedValues']);
     }
 
     public function testSanitizeHandlesExceptionsAndUsesFallbackValue(): void
     {
         $testObject = new class {
-            #[Sanitize(sanitizers: ['problematic'], fallbackValue: 'fallback')]
+            #[Sanitize(processors: ['problematic'], messages: ['fallback' => 'Processing failed'])]
             public string $problematic = 'cause problem';
         };
 
@@ -109,16 +109,16 @@ final class SanitizerTest extends TestCase
         $sanitizedValues = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('cause problem', $testObject->problematic);
-        $this->assertEmpty($sanitizedValues);
+        $this->assertArrayNotHasKey('problematic', $sanitizedValues['sanitizedValues']);
     }
 
     public function testSanitizeHandlesPrivateAndProtectedProperties(): void
     {
         $testObject = new class {
-            #[Sanitize(sanitizers: ['trim'])]
+            #[Sanitize(processors: ['trim'])]
             private string $privateProp = '  private  ';
 
-            #[Sanitize(sanitizers: ['trim'])]
+            #[Sanitize(processors: ['trim'])]
             protected string $protectedProp = '  protected  ';
 
             public function getPrivateProp(): string
@@ -149,14 +149,14 @@ final class SanitizerTest extends TestCase
 
         $this->assertSame('private', $testObject->getPrivateProp());
         $this->assertSame('protected', $testObject->getProtectedProp());
-        $this->assertArrayHasKey('privateProp', $sanitizedValues);
-        $this->assertArrayHasKey('protectedProp', $sanitizedValues);
+        $this->assertArrayHasKey('privateProp', $sanitizedValues['sanitizedValues']);
+        $this->assertArrayHasKey('protectedProp', $sanitizedValues['sanitizedValues']);
     }
 
     public function testSanitizeHandlesMultipleProcessorsForSingleProperty(): void
     {
         $testObject = new class {
-            #[Sanitize(sanitizers: ['trim', 'uppercase'])]
+            #[Sanitize(processors: ['trim', 'uppercase'])]
             public string $multiProcessed = '  hello world  ';
         };
 
@@ -182,7 +182,7 @@ final class SanitizerTest extends TestCase
         $sanitizedValues = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('HELLO WORLD', $testObject->multiProcessed);
-        $this->assertArrayHasKey('multiProcessed', $sanitizedValues);
-        $this->assertSame(['HELLO WORLD'], $sanitizedValues['multiProcessed']);
+        $this->assertArrayHasKey('multiProcessed', $sanitizedValues['sanitizedValues']);
+        $this->assertSame('HELLO WORLD', $sanitizedValues['sanitizedValues']['multiProcessed']['value']);
     }
 }

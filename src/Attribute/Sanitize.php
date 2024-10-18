@@ -1,27 +1,29 @@
 <?php
 
-declare(strict_types=1);
-
 namespace KaririCode\Sanitizer\Attribute;
 
-use KaririCode\Contract\Processor\ProcessableAttribute;
+use KaririCode\Contract\Processor\Attribute\CustomizableMessageAttribute;
+use KaririCode\Contract\Processor\Attribute\ProcessableAttribute;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Sanitize implements ProcessableAttribute
+final class Sanitize implements ProcessableAttribute, CustomizableMessageAttribute
 {
-    public function __construct(
-        public readonly array $sanitizers,
-        public readonly mixed $fallbackValue = null
-    ) {
+    private readonly array $processors;
+    private readonly array $messages;
+
+    public function __construct(array $processors, ?array $messages = null)
+    {
+        $this->processors = array_filter($processors, fn ($v) => !is_null($v) && false !== $v);
+        $this->messages = $messages ?? [];
     }
 
     public function getProcessors(): array
     {
-        return $this->sanitizers;
+        return $this->processors;
     }
 
-    public function getFallbackValue(): mixed
+    public function getMessage($processorName): ?string
     {
-        return $this->fallbackValue;
+        return $this->messages[$processorName] ?? null;
     }
 }
