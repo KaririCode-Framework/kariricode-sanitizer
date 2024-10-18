@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace KaririCode\Sanitizer\Tests\Attribute;
 
-use KaririCode\Contract\Processor\ProcessableAttribute;
+use KaririCode\Contract\Processor\Attribute\CustomizableMessageAttribute;
+use KaririCode\Contract\Processor\Attribute\ProcessableAttribute;
 use KaririCode\Sanitizer\Attribute\Sanitize;
 use PHPUnit\Framework\TestCase;
 
@@ -12,7 +13,14 @@ final class SanitizeTest extends TestCase
 {
     public function testSanitizeImplementsProcessableAttribute(): void
     {
-        $this->assertInstanceOf(ProcessableAttribute::class, new Sanitize([]));
+        $sanitize = new Sanitize([]);
+        $this->assertInstanceOf(ProcessableAttribute::class, $sanitize);
+    }
+
+    public function testSanitizeImplementsCustomizableMessageAttribute(): void
+    {
+        $sanitize = new Sanitize([]);
+        $this->assertInstanceOf(CustomizableMessageAttribute::class, $sanitize);
     }
 
     public function testSanitizeIsAttribute(): void
@@ -25,54 +33,42 @@ final class SanitizeTest extends TestCase
         $this->assertSame([\Attribute::TARGET_PROPERTY], $attributes[0]->getArguments());
     }
 
-    public function testConstructorSetsSanitizers(): void
+    public function testConstructorFiltersInvalidProcessors(): void
     {
-        $sanitizers = ['trim', 'htmlspecialchars'];
-        $sanitize = new Sanitize($sanitizers);
+        $processors = ['trim', null, false, 'htmlspecialchars'];
+        $expectedProcessors = ['trim', 'htmlspecialchars'];
+        $sanitize = new Sanitize($processors);
 
-        $this->assertSame($sanitizers, $sanitize->sanitizers);
+        $this->assertSame(array_values($expectedProcessors), array_values($sanitize->getProcessors()));
     }
 
-    public function testConstructorSetsFallbackValue(): void
+    public function testGetProcessorsReturnsProcessors(): void
     {
-        $fallbackValue = 'default';
-        $sanitize = new Sanitize([], $fallbackValue);
+        $processors = ['trim', 'htmlspecialchars'];
+        $sanitize = new Sanitize($processors);
 
-        $this->assertSame($fallbackValue, $sanitize->fallbackValue);
+        $this->assertSame($processors, $sanitize->getProcessors());
     }
 
-    public function testConstructorSetsNullFallbackValueByDefault(): void
+    public function testGetMessageReturnsNullWhenNoMessagesProvided(): void
     {
-        $sanitize = new Sanitize([]);
-
-        $this->assertNull($sanitize->fallbackValue);
+        $sanitize = new Sanitize(['trim']);
+        $this->assertNull($sanitize->getMessage('trim'));
     }
 
-    public function testGetProcessorsReturnsSanitizers(): void
+    public function testGetMessageReturnsCustomMessage(): void
     {
-        $sanitizers = ['trim', 'htmlspecialchars'];
-        $sanitize = new Sanitize($sanitizers);
+        $messages = ['trim' => 'Trim applied'];
+        $sanitize = new Sanitize(['trim'], $messages);
 
-        $this->assertSame($sanitizers, $sanitize->getProcessors());
+        $this->assertSame('Trim applied', $sanitize->getMessage('trim'));
     }
 
-    public function testGetFallbackValueReturnsFallbackValue(): void
+    public function testGetMessageReturnsNullForUnknownProcessor(): void
     {
-        $fallbackValue = 'default';
-        $sanitize = new Sanitize([], $fallbackValue);
+        $messages = ['trim' => 'Trim applied'];
+        $sanitize = new Sanitize(['trim'], $messages);
 
-        $this->assertSame($fallbackValue, $sanitize->getFallbackValue());
-    }
-
-    public function testSanitizeWithMultipleArguments(): void
-    {
-        $sanitizers = ['trim', 'htmlspecialchars'];
-        $fallbackValue = 'default';
-        $sanitize = new Sanitize($sanitizers, $fallbackValue);
-
-        $this->assertSame($sanitizers, $sanitize->sanitizers);
-        $this->assertSame($fallbackValue, $sanitize->fallbackValue);
-        $this->assertSame($sanitizers, $sanitize->getProcessors());
-        $this->assertSame($fallbackValue, $sanitize->getFallbackValue());
+        $this->assertNull($sanitize->getMessage('htmlspecialchars'));
     }
 }

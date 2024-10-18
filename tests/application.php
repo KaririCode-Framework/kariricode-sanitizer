@@ -20,16 +20,43 @@ use KaririCode\Sanitizer\Sanitizer;
 
 class UserProfile
 {
-    #[Sanitize(sanitizers: ['trim', 'html_purifier', 'xss_sanitizer', 'html_special_chars'])]
+    #[Sanitize(
+        processors: ['trim', 'html_purifier', 'xss_sanitizer', 'html_special_chars'],
+        messages: [
+            'trim' => 'Name was trimmed',
+            'html_purifier' => 'HTML was purified in name',
+            'xss_sanitizer' => 'XSS attempt was removed from name',
+            'html_special_chars' => 'Special characters were escaped in name',
+        ]
+    )]
     private string $name = '';
 
-    #[Sanitize(sanitizers: ['trim', 'normalize_line_breaks'])]
+    #[Sanitize(
+        processors: ['trim', 'normalize_line_breaks'],
+        messages: [
+            'trim' => 'Email was trimmed',
+            'normalize_line_breaks' => 'Line breaks in email were normalized',
+        ]
+    )]
     private string $email = '';
 
-    #[Sanitize(sanitizers: ['trim', 'strip_tags'])]
+    #[Sanitize(
+        processors: ['trim', 'strip_tags'],
+        messages: [
+            'trim' => 'Age was trimmed',
+            'strip_tags' => 'HTML tags were removed from age',
+        ]
+    )]
     private string $age = '';
 
-    #[Sanitize(sanitizers: ['trim', 'html_purifier', 'markdown'], fallbackValue: 'No bio provided')]
+    #[Sanitize(
+        processors: ['trim', 'html_purifier', 'markdown'],
+        messages: [
+            'trim' => 'Bio was trimmed',
+            'html_purifier' => 'HTML was purified in bio',
+            'markdown' => 'Markdown in bio was processed',
+        ]
+    )]
     private string $bio = '';
 
     public function getName(): string
@@ -73,54 +100,6 @@ class UserProfile
     }
 }
 
-class UserPreferences
-{
-    #[Sanitize(sanitizers: ['json'])]
-    private string $preferences = '';
-
-    public function getPreferences(): string
-    {
-        return $this->preferences;
-    }
-
-    public function setPreferences(string $preferences): void
-    {
-        $this->preferences = $preferences;
-    }
-}
-
-class UserAvatar
-{
-    #[Sanitize(sanitizers: ['filename'])]
-    private string $avatarFilename = '';
-
-    public function getAvatarFilename(): string
-    {
-        return $this->avatarFilename;
-    }
-
-    public function setAvatarFilename(string $avatarFilename): void
-    {
-        $this->avatarFilename = $avatarFilename;
-    }
-}
-
-class UserSearch
-{
-    #[Sanitize(sanitizers: ['sql_injection'])]
-    private string $searchQuery = '';
-
-    public function getSearchQuery(): string
-    {
-        return $this->searchQuery;
-    }
-
-    public function setSearchQuery(string $searchQuery): void
-    {
-        $this->searchQuery = $searchQuery;
-    }
-}
-
 $registry = new ProcessorRegistry();
 $registry->register('sanitizer', 'trim', new TrimSanitizer());
 $registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
@@ -142,17 +121,7 @@ $userProfile->setEmail(" walmir.silva@example.com \r\n");
 $userProfile->setAge(' <b>35</b> ');
 $userProfile->setBio("# Hello\n\n<p>I'm Walmir!</p><script>alert('bio')</script>");
 
-$userPreferences = new UserPreferences();
-$userPreferences->setPreferences('{"theme": "dark", "notifications": true}');
-
-$userAvatar = new UserAvatar();
-$userAvatar->setAvatarFilename('my avatar!.jpg');
-
-$userSearch = new UserSearch();
-$userSearch->setSearchQuery("users'; DROP TABLE users; --");
-
 // Function to display original and sanitized values
-
 function displayValues($object, $sanitizer)
 {
     echo "Original values:\n";
@@ -165,28 +134,43 @@ function displayValues($object, $sanitizer)
         }
     }
 
-    $sanitizer->sanitize($object);
+    $result = $sanitizer->sanitize($object);
 
     echo "\nSanitized values:\n";
     foreach ($reflection->getProperties() as $property) {
         $propertyName = $property->getName();
         $getter = 'get' . ucfirst($propertyName);
         if (method_exists($object, $getter)) {
-            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $object->$getter()) . "\"\n";
+            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $result['object']->$getter()) . "\"\n";
         }
     }
+
+    if (!empty($result['sanitizedValues'])) {
+        echo "\nSanitized values details:\n";
+        foreach ($result['sanitizedValues'] as $property => $data) {
+            echo ucfirst($property) . ":\n";
+            if (!empty($data['messages'])) {
+                foreach ($data['messages'] as $processorName => $message) {
+                    echo "  - [$processorName] $message\n";
+                }
+            }
+            echo '  Value: ' . json_encode($data['value']) . "\n";
+        }
+    }
+
+    if (!empty($result['errors'])) {
+        echo "\nErrors:\n";
+        foreach ($result['errors'] as $property => $errors) {
+            echo ucfirst($property) . ":\n";
+            foreach ($errors as $error) {
+                echo "  - $error\n";
+            }
+        }
+    }
+
     echo "\n";
 }
 
 // Display and sanitize values for each object
 echo "User Profile:\n";
 displayValues($userProfile, $autoSanitizer);
-
-echo "User Preferences:\n";
-displayValues($userPreferences, $autoSanitizer);
-
-echo "User Avatar:\n";
-displayValues($userAvatar, $autoSanitizer);
-
-echo "User Search:\n";
-displayValues($userSearch, $autoSanitizer);
