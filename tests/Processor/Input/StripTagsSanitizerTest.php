@@ -17,51 +17,80 @@ final class StripTagsSanitizerTest extends TestCase
         $this->sanitizer = new StripTagsSanitizer();
     }
 
-    public function testStripAllTags(): void
+    /**
+     * @dataProvider stripTagsProvider
+     */
+    public function testBasicStripping(string $input, array $config, string $expected): void
     {
-        $input = '<p>test</p><script>alert("xss")</script>';
-        $expected = 'testalert("xss")';
-        $this->assertEquals($expected, $this->sanitizer->process($input));
+        $this->sanitizer->configure($config);
+        self::assertSame($expected, $this->sanitizer->process($input));
     }
 
-    public function testAllowSpecificTags(): void
+    public function testWithAllowedTagsAndAttributes(): void
     {
-        $this->sanitizer->configure(['allowedTags' => ['p']]);
-        $input = '<p>test</p><script>alert("xss")</script>';
-        $expected = '<p>test</p>alert("xss")';
-        $this->assertEquals($expected, $this->sanitizer->process($input));
+        $this->sanitizer->configure([
+            'allowedTags' => ['p', 'div'],
+            'keepSafeAttributes' => true,
+            'safeAttributes' => ['class', 'id'],
+        ]);
+
+        $input = '<p class="test" onclick="alert()">Text</p><script>alert()</script>';
+        $expected = '<p class="test">Text</p>';
+
+        $this->assertSame($expected, $this->sanitizer->process($input));
     }
 
-    public function testHandleNestedTags(): void
+    public function testWithoutSafeAttributes(): void
     {
-        $this->sanitizer->configure(['allowedTags' => ['p', 'strong']]);
-        $input = '<p>This is <strong>important</strong> and <em>emphasized</em></p>';
-        $expected = '<p>This is <strong>important</strong> and emphasized</p>';
-        $this->assertEquals($expected, $this->sanitizer->process($input));
+        $this->sanitizer->configure([
+            'allowedTags' => ['p'],
+            'keepSafeAttributes' => false,
+        ]);
+
+        $input = '<p class="test" id="demo">Text</p>';
+        $expected = '<p>Text</p>';
+
+        $this->assertSame($expected, $this->sanitizer->process($input));
     }
 
-    public function testHandleInvalidHtml(): void
-    {
-        $input = '<p>Unclosed paragraph <strong>Bold text</p>';
-        $expected = 'Unclosed paragraph Bold text';
-        $this->assertEquals($expected, $this->sanitizer->process($input));
-    }
-
-    public function testPreserveTextContent(): void
-    {
-        $input = '<div>Hello, <b>world</b>!</div>';
-        $expected = 'Hello, world!';
-        $this->assertEquals($expected, $this->sanitizer->process($input));
-    }
-
-    public function testHandleEmptyInput(): void
-    {
-        $this->assertEquals('', $this->sanitizer->process(''));
-    }
-
-    public function testNonStringInput(): void
+    public function testHandleNonStringInput(): void
     {
         $this->expectException(SanitizationException::class);
         $this->sanitizer->process(123);
+    }
+
+    public static function stripTagsProvider(): array
+    {
+        return [
+            'no tags' => [
+                'Plain text content',
+                [],
+                'Plain text content',
+            ],
+            'simple tags' => [
+                '<p>Paragraph</p><div>Division</div>',
+                [],
+                'ParagraphDivision',
+            ],
+            'nested tags' => [
+                '<div><p>Nested content</p></div>',
+                ['allowedTags' => ['div']],
+                '<div>Nested content</div>',
+            ],
+            'mixed content' => [
+                '<p>Text</p><script>alert()</script><style>.css{}</style>',
+                ['allowedTags' => ['p']],
+                '<p>Text</p>',
+            ],
+            'with attributes' => [
+                '<p class="test" id="demo">Text</p>',
+                [
+                    'allowedTags' => ['p'],
+                    'keepSafeAttributes' => true,
+                    'safeAttributes' => ['class'],
+                ],
+                '<p class="test">Text</p>',
+            ],
+        ];
     }
 }

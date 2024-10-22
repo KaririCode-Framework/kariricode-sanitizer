@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+namespace KaririCode\Sanitizer\Tests;
+
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/UserProfile.php';
 
 use KaririCode\ProcessorPipeline\ProcessorRegistry;
 use KaririCode\Sanitizer\Attribute\Sanitize;
@@ -18,88 +21,6 @@ use KaririCode\Sanitizer\Processor\Security\SqlInjectionSanitizer;
 use KaririCode\Sanitizer\Processor\Security\XssSanitizer;
 use KaririCode\Sanitizer\Sanitizer;
 
-class UserProfile
-{
-    #[Sanitize(
-        processors: ['trim', 'html_purifier', 'xss_sanitizer', 'html_special_chars'],
-        messages: [
-            'trim' => 'Name was trimmed',
-            'html_purifier' => 'HTML was purified in name',
-            'xss_sanitizer' => 'XSS attempt was removed from name',
-            'html_special_chars' => 'Special characters were escaped in name',
-        ]
-    )]
-    private string $name = '';
-
-    #[Sanitize(
-        processors: ['trim', 'normalize_line_breaks'],
-        messages: [
-            'trim' => 'Email was trimmed',
-            'normalize_line_breaks' => 'Line breaks in email were normalized',
-        ]
-    )]
-    private string $email = '';
-
-    #[Sanitize(
-        processors: ['trim', 'strip_tags'],
-        messages: [
-            'trim' => 'Age was trimmed',
-            'strip_tags' => 'HTML tags were removed from age',
-        ]
-    )]
-    private string $age = '';
-
-    #[Sanitize(
-        processors: ['trim', 'html_purifier', 'markdown'],
-        messages: [
-            'trim' => 'Bio was trimmed',
-            'html_purifier' => 'HTML was purified in bio',
-            'markdown' => 'Markdown in bio was processed',
-        ]
-    )]
-    private string $bio = '';
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): void
-    {
-        $this->email = $email;
-    }
-
-    public function getAge(): string
-    {
-        return $this->age;
-    }
-
-    public function setAge(string $age): void
-    {
-        $this->age = $age;
-    }
-
-    public function getBio(): string
-    {
-        return $this->bio;
-    }
-
-    public function setBio(string $bio): void
-    {
-        $this->bio = $bio;
-    }
-}
-
 $registry = new ProcessorRegistry();
 $registry->register('sanitizer', 'trim', new TrimSanitizer());
 $registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
@@ -111,6 +32,11 @@ $registry->register('sanitizer', 'markdown', new MarkdownSanitizer());
 $registry->register('sanitizer', 'filename', new FilenameSanitizer());
 $registry->register('sanitizer', 'sql_injection', new SqlInjectionSanitizer());
 $registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
+$registry->register('sanitizer', 'email_sanitizer', new EmailSanitizer());
+$registry->register('sanitizer', 'numeric_sanitizer', new NumericSanitizer());
+$registry->register('sanitizer', 'phone_sanitizer', new PhoneSanitizer());
+$registry->register('sanitizer', 'url_sanitizer', new UrlSanitizer());
+$registry->register('sanitizer', 'alphanumeric_sanitizer', new AlphanumericSanitizer());
 
 $autoSanitizer = new Sanitizer($registry);
 
@@ -121,9 +47,15 @@ $userProfile->setEmail(" walmir.silva@example.com \r\n");
 $userProfile->setAge(' <b>35</b> ');
 $userProfile->setBio("# Hello\n\n<p>I'm Walmir!</p><script>alert('bio')</script>");
 
-// Function to display original and sanitized values
-function displayValues($object, $sanitizer)
+/**
+ * Display original and sanitized values for an object.
+ *
+ * @param object $object The object to display values for
+ * @param Sanitizer $sanitizer The sanitizer instance
+ */
+function displayValues(object $object, Sanitizer $sanitizer): void
 {
+    // Display original values
     echo "Original values:\n";
     $reflection = new ReflectionClass($object);
     foreach ($reflection->getProperties() as $property) {
@@ -134,36 +66,35 @@ function displayValues($object, $sanitizer)
         }
     }
 
+    // Sanitize the object and get the result
     $result = $sanitizer->sanitize($object);
+    $sanitizedData = $result->getSanitizedData();
 
+    // Display sanitized values
     echo "\nSanitized values:\n";
     foreach ($reflection->getProperties() as $property) {
         $propertyName = $property->getName();
-        $getter = 'get' . ucfirst($propertyName);
-        if (method_exists($object, $getter)) {
-            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $result['object']->$getter()) . "\"\n";
+        if (isset($sanitizedData[$propertyName])) {
+            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $sanitizedData[$propertyName]) . "\"\n";
         }
     }
 
-    if (!empty($result['sanitizedValues'])) {
-        echo "\nSanitized values details:\n";
-        foreach ($result['sanitizedValues'] as $property => $data) {
+    // Display processing details if there are any
+    if ($result->toArray()['sanitizedData']) {
+        echo "\nSanitization details:\n";
+        foreach ($result->toArray()['sanitizedData'] as $property => $value) {
             echo ucfirst($property) . ":\n";
-            if (!empty($data['messages'])) {
-                foreach ($data['messages'] as $processorName => $message) {
-                    echo "  - [$processorName] $message\n";
-                }
-            }
-            echo '  Value: ' . json_encode($data['value']) . "\n";
+            echo '  Value: ' . json_encode($value) . "\n";
         }
     }
 
-    if (!empty($result['errors'])) {
+    // Display any errors that occurred during sanitization
+    if ($result->hasErrors()) {
         echo "\nErrors:\n";
-        foreach ($result['errors'] as $property => $errors) {
+        foreach ($result->getErrors() as $property => $errors) {
             echo ucfirst($property) . ":\n";
             foreach ($errors as $error) {
-                echo "  - $error\n";
+                echo "  - [{$error['errorKey']}] {$error['message']}\n";
             }
         }
     }
@@ -171,6 +102,6 @@ function displayValues($object, $sanitizer)
     echo "\n";
 }
 
-// Display and sanitize values for each object
+// Display and sanitize values for the user profile
 echo "User Profile:\n";
 displayValues($userProfile, $autoSanitizer);
