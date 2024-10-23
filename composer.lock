@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "kariricode/contract",
-            "version": "v2.7.9",
+            "version": "v2.7.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
-                "reference": "2174dd69812320a2ed88ab7ed0679eb6a42399fb"
+                "reference": "84db138e9e03e7173ee1a37d75fa21d756a6d060"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/2174dd69812320a2ed88ab7ed0679eb6a42399fb",
-                "reference": "2174dd69812320a2ed88ab7ed0679eb6a42399fb",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/84db138e9e03e7173ee1a37d75fa21d756a6d060",
+                "reference": "84db138e9e03e7173ee1a37d75fa21d756a6d060",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-contract"
             },
-            "time": "2024-10-18T21:09:48+00:00"
+            "time": "2024-10-21T18:32:50+00:00"
         },
         {
             "name": "kariricode/data-structure",
@@ -203,16 +203,16 @@
         },
         {
             "name": "kariricode/property-inspector",
-            "version": "v1.1.3",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-property-inspector.git",
-                "reference": "3c274722ac3260382a992dd06ee9dc8f4bfaf50f"
+                "reference": "7e70c17b74c69601514fa40a4f76aeb0c056e096"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/3c274722ac3260382a992dd06ee9dc8f4bfaf50f",
-                "reference": "3c274722ac3260382a992dd06ee9dc8f4bfaf50f",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/7e70c17b74c69601514fa40a4f76aeb0c056e096",
+                "reference": "7e70c17b74c69601514fa40a4f76aeb0c056e096",
                 "shasum": ""
             },
             "require": {
@@ -263,7 +263,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-property-inspector/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-property-inspector"
             },
-            "time": "2024-10-18T19:21:06+00:00"
+            "time": "2024-10-21T20:42:58+00:00"
         }
     ],
     "packages-dev": [
@@ -1778,16 +1778,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "11.4.1",
+            "version": "11.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "7875627f15f4da7e7f0823d1f323f7295a77334e"
+                "reference": "1863643c3f04ad03dcb9c6996c294784cdda4805"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7875627f15f4da7e7f0823d1f323f7295a77334e",
-                "reference": "7875627f15f4da7e7f0823d1f323f7295a77334e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1863643c3f04ad03dcb9c6996c294784cdda4805",
+                "reference": "1863643c3f04ad03dcb9c6996c294784cdda4805",
                 "shasum": ""
             },
             "require": {
@@ -1801,21 +1801,21 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.2",
-                "phpunit/php-code-coverage": "^11.0.6",
+                "phpunit/php-code-coverage": "^11.0.7",
                 "phpunit/php-file-iterator": "^5.1.0",
                 "phpunit/php-invoker": "^5.0.1",
                 "phpunit/php-text-template": "^4.0.1",
                 "phpunit/php-timer": "^7.0.1",
                 "sebastian/cli-parser": "^3.0.2",
                 "sebastian/code-unit": "^3.0.1",
-                "sebastian/comparator": "^6.1.0",
+                "sebastian/comparator": "^6.1.1",
                 "sebastian/diff": "^6.0.2",
                 "sebastian/environment": "^7.2.0",
                 "sebastian/exporter": "^6.1.3",
                 "sebastian/global-state": "^7.0.2",
                 "sebastian/object-enumerator": "^6.0.1",
                 "sebastian/type": "^5.1.0",
-                "sebastian/version": "^5.0.1"
+                "sebastian/version": "^5.0.2"
             },
             "suggest": {
                 "ext-soap": "To be able to generate mocks based on WSDL files"
@@ -1858,7 +1858,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.4.1"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.4.2"
             },
             "funding": [
                 {
@@ -1874,7 +1874,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-10-08T15:38:37+00:00"
+            "time": "2024-10-19T13:05:19+00:00"
         },
         {
             "name": "psr/container",

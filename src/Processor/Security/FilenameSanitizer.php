@@ -6,66 +6,91 @@ namespace KaririCode\Sanitizer\Processor\Security;
 
 use KaririCode\Contract\Processor\ConfigurableProcessor;
 use KaririCode\Sanitizer\Processor\AbstractSanitizerProcessor;
+use KaririCode\Sanitizer\Processor\Security\Filename\BasenameSanitizer;
+use KaririCode\Sanitizer\Processor\Security\Filename\Configuration;
+use KaririCode\Sanitizer\Processor\Security\Filename\ExtensionHandler;
+use KaririCode\Sanitizer\Processor\Security\Filename\FilenameParser;
+use KaririCode\Sanitizer\Trait\WhitespaceSanitizerTrait;
 
-class FilenameSanitizer extends AbstractSanitizerProcessor implements ConfigurableProcessor
+final class FilenameSanitizer extends AbstractSanitizerProcessor implements ConfigurableProcessor
 {
-    private string $replacement = '_';
-    private bool $preserveExtension = true;
-    private string $allowedChars = 'a-zA-Z0-9_\-\.';
+    use WhitespaceSanitizerTrait;
+
+    private readonly Configuration $config;
+    private ExtensionHandler $extensionHandler;
+    private FilenameParser $filenameParser;
+    private BasenameSanitizer $basenameSanitizer;
+
+    public function __construct()
+    {
+        $this->config = new Configuration();
+        $this->initializeDependencies();
+    }
 
     public function configure(array $options): void
     {
-        if (isset($options['replacement']) && $this->isValidReplacement($options['replacement'])) {
-            $this->replacement = $options['replacement'];
-        }
-
-        if (isset($options['preserveExtension'])) {
-            $this->preserveExtension = (bool) $options['preserveExtension'];
-        }
-
-        if (isset($options['allowedChars']) && is_array($options['allowedChars'])) {
-            $this->allowedChars = implode('', $options['allowedChars']);
-        }
+        $this->config->configure($options);
+        $this->initializeDependencies();
     }
 
     public function process(mixed $input): string
     {
         $input = $this->guardAgainstNonString($input);
+        $input = $this->trimWhitespace($input);
 
         if ('' === $input) {
             return '';
         }
 
-        [$filename, $extension] = $this->splitFilename($input);
-        $sanitized = $this->sanitizeFilename($filename);
+        [$basename, $extension] = $this->filenameParser->splitFilename(
+            $input,
+            $this->config->isPreserveExtension()
+        );
 
-        return $sanitized . $extension;
-    }
+        $sanitizedBasename = $this->basenameSanitizer->sanitize(
+            $basename,
+            $this->config->isPreserveExtension()
+        );
 
-    private function isValidReplacement(string $replacement): bool
-    {
-        return 1 === preg_match('/^[\w\-]$/', $replacement);
-    }
-
-    private function splitFilename(string $input): array
-    {
-        if ($this->preserveExtension) {
-            $pathInfo = pathinfo($input);
-            $filename = $pathInfo['filename'] ?? '';
-            $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
-        } else {
-            $filename = preg_replace('/\.[^.]+$/', '', $input) ?: '';
-            $extension = '';
+        if ('' === $sanitizedBasename) {
+            return '';
         }
 
-        return [$filename, $extension];
+        $sanitizedExtension = $extension ? $this->extensionHandler->sanitizeExtension($extension) : '';
+
+        return $this->buildFinalFilename($sanitizedBasename, $sanitizedExtension);
     }
 
-    private function sanitizeFilename(string $filename): string
+    private function initializeDependencies(): void
     {
-        $sanitized = preg_replace("/[^{$this->allowedChars}]/", $this->replacement, $filename) ?? '';
-        $sanitized = preg_replace('/' . preg_quote($this->replacement, '/') . '+/', $this->replacement, $sanitized) ?? '';
+        $this->extensionHandler = new ExtensionHandler(
+            $this->config->isBlockDangerousExtensions(),
+            $this->config->getAllowedExtensions()
+        );
 
-        return trim($sanitized, $this->replacement);
+        $this->filenameParser = new FilenameParser($this->extensionHandler);
+
+        $this->basenameSanitizer = new BasenameSanitizer(
+            $this->config->getReplacement(),
+            $this->config->isToLowerCase(),
+            $this->config->getMaxLength()
+        );
+    }
+
+    private function buildFinalFilename(string $basename, string $extension): string
+    {
+        $filename = $basename . $extension;
+
+        if (strlen($filename) > $this->config->getMaxLength()) {
+            $maxBasenameLength = $this->config->getMaxLength() - strlen($extension);
+            if ($maxBasenameLength > 0) {
+                $basename = substr($basename, 0, $maxBasenameLength);
+                $filename = $basename . $extension;
+            } else {
+                $filename = substr($filename, 0, $this->config->getMaxLength());
+            }
+        }
+
+        return $filename;
     }
 }

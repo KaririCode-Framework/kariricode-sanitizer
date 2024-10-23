@@ -28,7 +28,7 @@ final class FilenameSanitizerTest extends TestCase
     {
         $this->sanitizer->configure(['preserveExtension' => false]);
         $input = 'file@name!.txt';
-        $expected = 'file_name';
+        $expected = 'file_name_txt';
         $this->assertSame($expected, $this->sanitizer->process($input));
     }
 
@@ -81,7 +81,7 @@ final class FilenameSanitizerTest extends TestCase
     public function testFilenameWithMultipleExtensions(): void
     {
         $input = 'file.name@!.tar.gz';
-        $expected = 'file.name_.tar.gz';
+        $expected = 'file.name.tar.gz';
         $this->assertSame($expected, $this->sanitizer->process($input));
     }
 
