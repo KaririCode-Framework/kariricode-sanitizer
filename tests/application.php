@@ -15,9 +15,11 @@ use KaririCode\Sanitizer\Processor\Input\HtmlSpecialCharsSanitizer;
 use KaririCode\Sanitizer\Processor\Input\NormalizeLineBreaksSanitizer;
 use KaririCode\Sanitizer\Processor\Input\NumericSanitizer;
 use KaririCode\Sanitizer\Processor\Input\PhoneSanitizer;
+use KaririCode\Sanitizer\Processor\Input\StripTagsSanitizer;
 use KaririCode\Sanitizer\Processor\Input\TrimSanitizer;
 use KaririCode\Sanitizer\Processor\Input\UrlSanitizer;
 use KaririCode\Sanitizer\Processor\Security\FilenameSanitizer;
+use KaririCode\Sanitizer\Processor\Security\SqlInjectionSanitizer;
 use KaririCode\Sanitizer\Processor\Security\XssSanitizer;
 use KaririCode\Sanitizer\Sanitizer;
 
@@ -139,6 +141,30 @@ class JobApplication
     )]
     private string $projectsJson = '';
 
+    #[Sanitize(
+        processors: [
+            'trim',
+            'sql_injection' => [
+                'escapeMap' => [
+                    "'" => "\\'",
+                    '"' => '\\"',
+                ],
+            ],
+        ]
+    )]
+    private string $searchQuery = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'strip_tags' => [
+                'allowedTags' => ['p', 'br'],
+                'keepSafeAttributes' => true,
+            ],
+        ]
+    )]
+    private string $plainTextContent = '';
+
     // Getters and Setters
     public function getFullName(): string
     {
@@ -259,6 +285,30 @@ class JobApplication
 
         return $this;
     }
+
+    public function getSearchQuery(): string
+    {
+        return $this->searchQuery;
+    }
+
+    public function setSearchQuery(string $value): self
+    {
+        $this->searchQuery = $value;
+
+        return $this;
+    }
+
+    public function getPlainTextContent(): string
+    {
+        return $this->plainTextContent;
+    }
+
+    public function setPlainTextContent(string $value): self
+    {
+        $this->plainTextContent = $value;
+
+        return $this;
+    }
 }
 
 // Create and configure the registry
@@ -278,83 +328,89 @@ $registry->register('sanitizer', 'alphanumeric_sanitizer', new AlphanumericSanit
 $registry->register('sanitizer', 'filename_sanitizer', new FilenameSanitizer());
 $registry->register('sanitizer', 'json_sanitizer', new JsonSanitizer());
 $registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
+$registry->register('sanitizer', 'sql_injection', new SqlInjectionSanitizer());
+$registry->register('sanitizer', 'strip_tags', new StripTagsSanitizer());
 
-$sanitizer = new FilenameSanitizer();
-$sanitizer->configure([
-    'maxLength' => 100,
-    'toLowerCase' => true,
-    'allowedExtensions' => ['jpg', 'png', 'pdf'],
-    'blockDangerousExtensions' => true,
-]);
+// Create the sanitizer
+$sanitizer = new Sanitizer($registry);
 
-echo $sanitizer->process('My File Name.php') . "\n";  // Retorna "my_file_name"
-echo $sanitizer->process('Document.PDF');      // Retorna "document.pdf"
+// Create an application with potentially dangerous data
+$application = new JobApplication();
+$application
+    ->setFullName("  Walmir Silva <script>alert('xss')</script>  ")
+    ->setEmail(" walmir.silva@gmail.con \n")
+    ->setPhone('11987654321')
+    ->setProfessionalSummary("
+<h2>Professional Summary</h2>
 
-// // Create the sanitizer
-// $sanitizer = new Sanitizer($registry);
+<p>I am a senior developer with experience in:</p>
 
-// // Create an application with potentially dangerous data
-// $application = new JobApplication();
-// $application
-//     ->setFullName("  Walmir Silva <script>alert('xss')</script>  ")
-//     ->setEmail(" walmir.silva@gmail.con \n")
-//     ->setPhone("11987654321")
-//     ->setProfessionalSummary("
-// <h2>Professional Summary</h2>
+<ul>
+    <li>PHP Development</li>
+    <li>Database Design</li>
+    <li>System Architecture</li>
+</ul>
 
-// <p>I am a senior developer with experience in:</p>
+<p>Visit my website: <a href='https://example.com'>My Portfolio</a></p>
+")
+    ->setYearsOfExperience('10')
+    ->setPortfolioUrl('example.com/portfolio')
+    ->setGithubHandle('@walmir-silva')
+    ->setLinkedinHandle('Walmir-Silva')
+    ->setResumeFileName('Walmir Silva Resume (2024).pdf')
+    ->setProjectsJson('{
+        "projects": [
+            {
+                "name": "E-commerce Platform",
+                "role": "Lead Developer",
+                "duration": "2 years"
+            }
+        ]
+    }')
+    ->setProjectsJson('{
+        "projects": [
+            {
+                "name": "E-commerce Platform",
+                "role": "Lead Developer",
+                "duration": "2 years"
+            }
+        ]
+    }')
+    ->setSearchQuery("SELECT * FROM users'; DROP TABLE users; --")
+    ->setPlainTextContent('<p>Este é um texto com algumas <b>tags</b> HTML que precisam ser tratadas</p>');
 
-// <ul>
-//     <li>PHP Development</li>
-//     <li>Database Design</li>
-//     <li>System Architecture</li>
-// </ul>
+// Function to display the results
 
-// <p>Visit my website: <a href='https://example.com'>My Portfolio</a></p>
-// ")
-//     ->setYearsOfExperience("10")
-//     ->setPortfolioUrl("example.com/portfolio")
-//     ->setGithubHandle("@walmir-silva")
-//     ->setLinkedinHandle("Walmir-Silva")
-//     ->setResumeFileName("Walmir Silva Resume (2024).pdf")
-//     ->setProjectsJson('{
-//         "projects": [
-//             {
-//                 "name": "E-commerce Platform",
-//                 "role": "Lead Developer",
-//                 "duration": "2 years"
-//             }
-//         ]
-//     }');
+function displayResults(JobApplication $application, array $result): void
+{
+    echo "Job Application Sanitization Results:\n";
+    echo "=====================================\n\n";
 
-// // Function to display the results
-// function displayResults(JobApplication $application, array $result): void
-// {
-//     echo "Job Application Sanitization Results:\n";
-//     echo "=====================================\n\n";
+    echo "Sanitized Values:\n";
+    echo "----------------\n";
 
-//     echo "Sanitized Values:\n";
-//     echo "----------------\n";
+    // Display all sanitized values with clear formatting
+    echo sprintf("Full Name: %s\n", $application->getFullName());
+    echo sprintf("Email: %s\n", $application->getEmail());
+    echo sprintf("Phone: %s\n", $application->getPhone());
+    echo sprintf("Years of Experience: %s\n", $application->getYearsOfExperience());
+    echo sprintf("Portfolio URL: %s\n", $application->getPortfolioUrl());
+    echo sprintf("GitHub Handle: %s\n", $application->getGithubHandle());
+    echo sprintf("LinkedIn Handle: %s\n", $application->getLinkedinHandle());
+    echo sprintf("Resume Filename: %s\n", $application->getResumeFileName());
+    // Adicionar os novos campos aqui
+    echo sprintf("Search Query: %s\n", $application->getSearchQuery());
+    echo sprintf("Plain Text Content: %s\n", $application->getPlainTextContent());
 
-//     // Display all sanitized values with clear formatting
-//     echo sprintf("Full Name: %s\n", $application->getFullName());
-//     echo sprintf("Email: %s\n", $application->getEmail());
-//     echo sprintf("Phone: %s\n", $application->getPhone());
-//     echo sprintf("Years of Experience: %s\n", $application->getYearsOfExperience());
-//     echo sprintf("Portfolio URL: %s\n", $application->getPortfolioUrl());
-//     echo sprintf("GitHub Handle: %s\n", $application->getGithubHandle());
-//     echo sprintf("LinkedIn Handle: %s\n", $application->getLinkedinHandle());
-//     echo sprintf("Resume Filename: %s\n", $application->getResumeFileName());
+    echo "\nProfessional Summary:\n";
+    echo "-------------------\n";
+    echo $application->getProfessionalSummary() . "\n\n";
 
-//     echo "\nProfessional Summary:\n";
-//     echo "-------------------\n";
-//     echo $application->getProfessionalSummary() . "\n\n";
+    echo "Projects JSON:\n";
+    echo "-------------\n";
+    echo $application->getProjectsJson() . "\n";
+}
 
-//     echo "Projects JSON:\n";
-//     echo "-------------\n";
-//     echo $application->getProjectsJson() . "\n";
-// }
-
-// // Sanitize the application and display results
-// $result = $sanitizer->sanitize($application);
-// displayResults($application, $result->toArray());
+// Sanitize the application and display results
+$result = $sanitizer->sanitize($application);
+displayResults($application, $result->toArray());

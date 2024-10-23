@@ -9,7 +9,7 @@ use KaririCode\Sanitizer\Processor\AbstractSanitizerProcessor;
 
 final class SqlInjectionSanitizer extends AbstractSanitizerProcessor implements ConfigurableProcessor
 {
-    private const SQL_DETECTION_PATTERN = '/\b(SELECT|INSERT|UPDATE|DELETE|UNION|DROP|TRUNCATE|ALTER)\s.+\s(FROM|INTO|TABLE)\b/i';
+    // private const SQL_DETECTION_PATTERN = '/\b(SELECT|INSERT|UPDATE|DELETE|UNION|DROP|TRUNCATE|ALTER)\s.+\s(FROM|INTO|TABLE)\b/i';
     private const SUSPICIOUS_PATTERNS = [
         '/--.*$/m' => '',  // Remove single-line comments
         '/\/\*.*?\*\//s' => '',  // Remove multi-line comments
