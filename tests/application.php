@@ -279,6 +279,17 @@ $registry->register('sanitizer', 'filename_sanitizer', new FilenameSanitizer());
 $registry->register('sanitizer', 'json_sanitizer', new JsonSanitizer());
 $registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
 
+$sanitizer = new FilenameSanitizer();
+$sanitizer->configure([
+    'maxLength' => 100,
+    'toLowerCase' => true,
+    'allowedExtensions' => ['jpg', 'png', 'pdf'],
+    'blockDangerousExtensions' => true,
+]);
+
+echo $sanitizer->process('My File Name.php') . "\n";  // Retorna "my_file_name"
+echo $sanitizer->process('Document.PDF');      // Retorna "document.pdf"
+
 // // Create the sanitizer
 // $sanitizer = new Sanitizer($registry);
 
