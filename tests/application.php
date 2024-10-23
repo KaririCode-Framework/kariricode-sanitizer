@@ -2,106 +2,348 @@
 
 declare(strict_types=1);
 
-namespace KaririCode\Sanitizer\Tests;
-
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/UserProfile.php';
 
 use KaririCode\ProcessorPipeline\ProcessorRegistry;
 use KaririCode\Sanitizer\Attribute\Sanitize;
 use KaririCode\Sanitizer\Processor\Domain\HtmlPurifierSanitizer;
 use KaririCode\Sanitizer\Processor\Domain\JsonSanitizer;
 use KaririCode\Sanitizer\Processor\Domain\MarkdownSanitizer;
+use KaririCode\Sanitizer\Processor\Input\AlphanumericSanitizer;
+use KaririCode\Sanitizer\Processor\Input\EmailSanitizer;
 use KaririCode\Sanitizer\Processor\Input\HtmlSpecialCharsSanitizer;
 use KaririCode\Sanitizer\Processor\Input\NormalizeLineBreaksSanitizer;
-use KaririCode\Sanitizer\Processor\Input\StripTagsSanitizer;
+use KaririCode\Sanitizer\Processor\Input\NumericSanitizer;
+use KaririCode\Sanitizer\Processor\Input\PhoneSanitizer;
 use KaririCode\Sanitizer\Processor\Input\TrimSanitizer;
+use KaririCode\Sanitizer\Processor\Input\UrlSanitizer;
 use KaririCode\Sanitizer\Processor\Security\FilenameSanitizer;
-use KaririCode\Sanitizer\Processor\Security\SqlInjectionSanitizer;
 use KaririCode\Sanitizer\Processor\Security\XssSanitizer;
 use KaririCode\Sanitizer\Sanitizer;
 
+class JobApplication
+{
+    #[Sanitize(
+        processors: [
+            'trim',
+            'html_purifier' => [
+                'allowedTags' => [],
+                'allowedAttributes' => [],
+            ],
+            'xss_sanitizer',
+        ]
+    )]
+    private string $fullName = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'email_sanitizer' => [
+                'removeMailtoPrefix' => true,
+                'typoReplacements' => [
+                    '@gmail.con' => '@gmail.com',
+                    '@yaho.com' => '@yahoo.com',
+                ],
+            ],
+        ]
+    )]
+    private string $email = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'phone_sanitizer' => [
+                'applyFormat' => true,
+                'format' => '(##) #####-####',
+                'placeholder' => '#',
+            ],
+        ]
+    )]
+    private string $phone = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'html_purifier' => [
+                'allowedTags' => ['h2', 'p', 'ul', 'li', 'a'],
+                'allowedAttributes' => ['href' => ['a']],
+            ],
+        ]
+    )]
+    private string $professionalSummary = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'numeric_sanitizer' => [
+                'allowDecimal' => false,
+                'allowNegative' => false,
+            ],
+        ]
+    )]
+    private string $yearsOfExperience = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'url_sanitizer' => [
+                'enforceProtocol' => true,
+                'defaultProtocol' => 'https://',
+                'removeTrailingSlash' => true,
+            ],
+        ]
+    )]
+    private string $portfolioUrl = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'alphanumeric_sanitizer' => [
+                'allowUnderscore' => true,
+                'allowDash' => true,
+                'preserveCase' => false,
+            ],
+        ]
+    )]
+    private string $githubHandle = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'alphanumeric_sanitizer' => [
+                'allowUnderscore' => true,
+                'allowDash' => false,
+                'preserveCase' => false,
+            ],
+        ]
+    )]
+    private string $linkedinHandle = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'filename_sanitizer' => [
+                'replacement' => '-',
+                'preserveExtension' => true,
+                'allowedChars' => ['a-z', 'A-Z', '0-9', '-', '_', ' '],
+            ],
+        ]
+    )]
+    private string $resumeFileName = '';
+
+    #[Sanitize(
+        processors: [
+            'trim',
+            'json_sanitizer',
+        ]
+    )]
+    private string $projectsJson = '';
+
+    // Getters and Setters
+    public function getFullName(): string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(string $value): self
+    {
+        $this->fullName = $value;
+
+        return $this;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $value): self
+    {
+        $this->email = $value;
+
+        return $this;
+    }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $value): self
+    {
+        $this->phone = $value;
+
+        return $this;
+    }
+
+    public function getProfessionalSummary(): string
+    {
+        return $this->professionalSummary;
+    }
+
+    public function setProfessionalSummary(string $value): self
+    {
+        $this->professionalSummary = $value;
+
+        return $this;
+    }
+
+    public function getYearsOfExperience(): string
+    {
+        return $this->yearsOfExperience;
+    }
+
+    public function setYearsOfExperience(string $value): self
+    {
+        $this->yearsOfExperience = $value;
+
+        return $this;
+    }
+
+    public function getPortfolioUrl(): string
+    {
+        return $this->portfolioUrl;
+    }
+
+    public function setPortfolioUrl(string $value): self
+    {
+        $this->portfolioUrl = $value;
+
+        return $this;
+    }
+
+    public function getGithubHandle(): string
+    {
+        return $this->githubHandle;
+    }
+
+    public function setGithubHandle(string $value): self
+    {
+        $this->githubHandle = $value;
+
+        return $this;
+    }
+
+    public function getLinkedinHandle(): string
+    {
+        return $this->linkedinHandle;
+    }
+
+    public function setLinkedinHandle(string $value): self
+    {
+        $this->linkedinHandle = $value;
+
+        return $this;
+    }
+
+    public function getResumeFileName(): string
+    {
+        return $this->resumeFileName;
+    }
+
+    public function setResumeFileName(string $value): self
+    {
+        $this->resumeFileName = $value;
+
+        return $this;
+    }
+
+    public function getProjectsJson(): string
+    {
+        return $this->projectsJson;
+    }
+
+    public function setProjectsJson(string $value): self
+    {
+        $this->projectsJson = $value;
+
+        return $this;
+    }
+}
+
+// Create and configure the registry
 $registry = new ProcessorRegistry();
+
+// Register all required processors
 $registry->register('sanitizer', 'trim', new TrimSanitizer());
 $registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
 $registry->register('sanitizer', 'normalize_line_breaks', new NormalizeLineBreaksSanitizer());
-$registry->register('sanitizer', 'strip_tags', new StripTagsSanitizer());
 $registry->register('sanitizer', 'html_purifier', new HtmlPurifierSanitizer());
-$registry->register('sanitizer', 'json', new JsonSanitizer());
 $registry->register('sanitizer', 'markdown', new MarkdownSanitizer());
-$registry->register('sanitizer', 'filename', new FilenameSanitizer());
-$registry->register('sanitizer', 'sql_injection', new SqlInjectionSanitizer());
-$registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
-$registry->register('sanitizer', 'email_sanitizer', new EmailSanitizer());
 $registry->register('sanitizer', 'numeric_sanitizer', new NumericSanitizer());
+$registry->register('sanitizer', 'email_sanitizer', new EmailSanitizer());
 $registry->register('sanitizer', 'phone_sanitizer', new PhoneSanitizer());
 $registry->register('sanitizer', 'url_sanitizer', new UrlSanitizer());
 $registry->register('sanitizer', 'alphanumeric_sanitizer', new AlphanumericSanitizer());
+$registry->register('sanitizer', 'filename_sanitizer', new FilenameSanitizer());
+$registry->register('sanitizer', 'json_sanitizer', new JsonSanitizer());
+$registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
 
-$autoSanitizer = new Sanitizer($registry);
+// // Create the sanitizer
+// $sanitizer = new Sanitizer($registry);
 
-// Create input objects with potentially unsafe data
-$userProfile = new UserProfile();
-$userProfile->setName("  Walmir Silva <script>alert('xss')</script>  ");
-$userProfile->setEmail(" walmir.silva@example.com \r\n");
-$userProfile->setAge(' <b>35</b> ');
-$userProfile->setBio("# Hello\n\n<p>I'm Walmir!</p><script>alert('bio')</script>");
+// // Create an application with potentially dangerous data
+// $application = new JobApplication();
+// $application
+//     ->setFullName("  Walmir Silva <script>alert('xss')</script>  ")
+//     ->setEmail(" walmir.silva@gmail.con \n")
+//     ->setPhone("11987654321")
+//     ->setProfessionalSummary("
+// <h2>Professional Summary</h2>
 
-/**
- * Display original and sanitized values for an object.
- *
- * @param object $object The object to display values for
- * @param Sanitizer $sanitizer The sanitizer instance
- */
-function displayValues(object $object, Sanitizer $sanitizer): void
-{
-    // Display original values
-    echo "Original values:\n";
-    $reflection = new ReflectionClass($object);
-    foreach ($reflection->getProperties() as $property) {
-        $propertyName = $property->getName();
-        $getter = 'get' . ucfirst($propertyName);
-        if (method_exists($object, $getter)) {
-            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $object->$getter()) . "\"\n";
-        }
-    }
+// <p>I am a senior developer with experience in:</p>
 
-    // Sanitize the object and get the result
-    $result = $sanitizer->sanitize($object);
-    $sanitizedData = $result->getSanitizedData();
+// <ul>
+//     <li>PHP Development</li>
+//     <li>Database Design</li>
+//     <li>System Architecture</li>
+// </ul>
 
-    // Display sanitized values
-    echo "\nSanitized values:\n";
-    foreach ($reflection->getProperties() as $property) {
-        $propertyName = $property->getName();
-        if (isset($sanitizedData[$propertyName])) {
-            echo ucfirst($propertyName) . ': "' . str_replace("\n", '\n', $sanitizedData[$propertyName]) . "\"\n";
-        }
-    }
+// <p>Visit my website: <a href='https://example.com'>My Portfolio</a></p>
+// ")
+//     ->setYearsOfExperience("10")
+//     ->setPortfolioUrl("example.com/portfolio")
+//     ->setGithubHandle("@walmir-silva")
+//     ->setLinkedinHandle("Walmir-Silva")
+//     ->setResumeFileName("Walmir Silva Resume (2024).pdf")
+//     ->setProjectsJson('{
+//         "projects": [
+//             {
+//                 "name": "E-commerce Platform",
+//                 "role": "Lead Developer",
+//                 "duration": "2 years"
+//             }
+//         ]
+//     }');
 
-    // Display processing details if there are any
-    if ($result->toArray()['sanitizedData']) {
-        echo "\nSanitization details:\n";
-        foreach ($result->toArray()['sanitizedData'] as $property => $value) {
-            echo ucfirst($property) . ":\n";
-            echo '  Value: ' . json_encode($value) . "\n";
-        }
-    }
+// // Function to display the results
+// function displayResults(JobApplication $application, array $result): void
+// {
+//     echo "Job Application Sanitization Results:\n";
+//     echo "=====================================\n\n";
 
-    // Display any errors that occurred during sanitization
-    if ($result->hasErrors()) {
-        echo "\nErrors:\n";
-        foreach ($result->getErrors() as $property => $errors) {
-            echo ucfirst($property) . ":\n";
-            foreach ($errors as $error) {
-                echo "  - [{$error['errorKey']}] {$error['message']}\n";
-            }
-        }
-    }
+//     echo "Sanitized Values:\n";
+//     echo "----------------\n";
 
-    echo "\n";
-}
+//     // Display all sanitized values with clear formatting
+//     echo sprintf("Full Name: %s\n", $application->getFullName());
+//     echo sprintf("Email: %s\n", $application->getEmail());
+//     echo sprintf("Phone: %s\n", $application->getPhone());
+//     echo sprintf("Years of Experience: %s\n", $application->getYearsOfExperience());
+//     echo sprintf("Portfolio URL: %s\n", $application->getPortfolioUrl());
+//     echo sprintf("GitHub Handle: %s\n", $application->getGithubHandle());
+//     echo sprintf("LinkedIn Handle: %s\n", $application->getLinkedinHandle());
+//     echo sprintf("Resume Filename: %s\n", $application->getResumeFileName());
 
-// Display and sanitize values for the user profile
-echo "User Profile:\n";
-displayValues($userProfile, $autoSanitizer);
+//     echo "\nProfessional Summary:\n";
+//     echo "-------------------\n";
+//     echo $application->getProfessionalSummary() . "\n\n";
+
+//     echo "Projects JSON:\n";
+//     echo "-------------\n";
+//     echo $application->getProjectsJson() . "\n";
+// }
+
+// // Sanitize the application and display results
+// $result = $sanitizer->sanitize($application);
+// displayResults($application, $result->toArray());
