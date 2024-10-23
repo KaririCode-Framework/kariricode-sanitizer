@@ -1,35 +1,37 @@
-# Framework KaririCode: Sanitizer Component
+# KaririCode Framework: Componente Sanitizador
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](README.md) [![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](README.pt-br.md)
-
-![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![PHPUnit](https://img.shields.io/badge/PHPUnit-3776AB?style=for-the-badge&logo=php&logoColor=white)
-
-Um componente robusto e flexível de sanitização de dados para PHP, parte do Framework KaririCode. Utiliza processadores configuráveis e funções nativas para garantir a integridade e segurança dos dados em suas aplicações.
+Um componente robusto e flexível de sanitização de dados para PHP, parte do KaririCode Framework. Utiliza processadores configuráveis e funções nativas para garantir a integridade e segurança dos dados em suas aplicações.
 
 ## Índice
 
-- [Características](#características)
-- [Instalação](#instalação)
+- [Funcionalidades](#funcionalidades)
+- [Instalação](#instalacao)
 - [Uso](#uso)
-  - [Uso Básico](#uso-básico)
-  - [Uso Avançado: Sanitização de Post de Blog](#uso-avançado-sanitização-de-post-de-blog)
-- [Sanitizadores Disponíveis](#sanitizadores-disponíveis)
-- [Configuração](#configuração)
-- [Integração com Outros Componentes KaririCode](#integração-com-outros-componentes-kariricode)
+  - [Uso Básico](#uso-basico)
+  - [Uso Avançado: Sanitização de Postagem de Blog](#uso-avancado-sanitizacao-de-postagem-de-blog)
+- [Sanitizadores Disponíveis](#sanitizadores-disponiveis)
+  - [Sanitizadores de Entrada](#sanitizadores-de-entrada)
+  - [Sanitizadores de Domínio](#sanitizadores-de-dominio)
+  - [Sanitizadores de Segurança](#sanitizadores-de-seguranca)
+- [Configuração](#configuracao)
+- [Integração com Outros Componentes do KaririCode](#integracao-com-outros-componentes-do-kariricode)
 - [Desenvolvimento e Testes](#desenvolvimento-e-testes)
 - [Contribuindo](#contribuindo)
-- [Licença](#licença)
+- [Licença](#licenca)
 - [Suporte e Comunidade](#suporte-e-comunidade)
 
-## Características
+## Funcionalidades
 
 - Sanitização flexível baseada em atributos para propriedades de objetos
-- Conjunto abrangente de sanitizadores integrados para casos de uso comuns
-- Fácil integração com outros componentes KaririCode
+- Conjunto abrangente de sanitizadores para casos de uso comuns
+- Fácil integração com outros componentes do KaririCode
 - Processadores configuráveis para lógica de sanitização personalizada
-- Suporte a valores de fallback em caso de falhas na sanitização
+- Suporte para valores de fallback em caso de falhas de sanitização
 - Arquitetura extensível permitindo sanitizadores personalizados
-- Tratamento e relatório de erros robusto
+- Tratamento de erros robusto e relatórios detalhados
+- Pipelines de sanitização encadeáveis para transformações complexas de dados
+- Suporte nativo para múltiplas codificações de caracteres
+- Proteção contra ataques XSS e injeção de SQL
 
 ## Instalação
 
@@ -43,6 +45,7 @@ composer require kariricode/sanitizer
 
 - PHP 8.3 ou superior
 - Composer
+- Extensões: `ext-mbstring`, `ext-dom`, `ext-libxml`
 
 ## Uso
 
@@ -53,195 +56,196 @@ composer require kariricode/sanitizer
 ```php
 use KaririCode\Sanitizer\Attribute\Sanitize;
 
-class PerfilUsuario
+class UserProfile
 {
     #[Sanitize(processors: ['trim', 'html_special_chars'])]
-    private string $nome = '';
+    private string $name = '';
 
-    #[Sanitize(processors: ['trim', 'normalize_line_breaks'])]
+    #[Sanitize(processors: ['trim', 'email_sanitizer'])]
     private string $email = '';
 
     // Getters e setters...
 }
 ```
 
-2. Configure o sanitizador e use-o:
+2. Configure o sanitizador e utilize-o:
 
 ```php
 use KaririCode\ProcessorPipeline\ProcessorRegistry;
 use KaririCode\Sanitizer\Sanitizer;
 use KaririCode\Sanitizer\Processor\Input\TrimSanitizer;
 use KaririCode\Sanitizer\Processor\Input\HtmlSpecialCharsSanitizer;
-use KaririCode\Sanitizer\Processor\Input\NormalizeLineBreaksSanitizer;
+use KaririCode\Sanitizer\Processor\Input\EmailSanitizer;
 
 $registry = new ProcessorRegistry();
 $registry->register('sanitizer', 'trim', new TrimSanitizer());
 $registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
-$registry->register('sanitizer', 'normalize_line_breaks', new NormalizeLineBreaksSanitizer());
+$registry->register('sanitizer', 'email_sanitizer', new EmailSanitizer());
 
 $sanitizer = new Sanitizer($registry);
 
-$perfilUsuario = new PerfilUsuario();
-$perfilUsuario->setNome("  João Silva  ");
-$perfilUsuario->setEmail("joao.silva@exemplo.com\r\n");
+$userProfile = new UserProfile();
+$userProfile->setName("  Walmir Silva <script>alert('xss')</script>  ");
+$userProfile->setEmail(" walmir.silva@gmail.con ");
 
-$resultado = $sanitizer->sanitize($perfilUsuario);
+$result = $sanitizer->sanitize($userProfile);
 
-echo $perfilUsuario->getNome(); // Saída: "João Silva"
-echo $perfilUsuario->getEmail(); // Saída: "joao.silva@exemplo.com\n"
-
-// Acesse os resultados da sanitização
-print_r($resultado['sanitizedValues']);
-print_r($resultado['messages']);
-print_r($resultado['errors']);
+echo $userProfile->getName(); // Output: "Walmir Silva"
+echo $userProfile->getEmail(); // Output: "walmir.silva@gmail.com"
 ```
 
-### Uso Avançado: Sanitização de Post de Blog
+### Uso Avançado: Sanitização de Postagem de Blog
 
-Aqui está um exemplo mais abrangente demonstrando como usar o Sanitizer do KaririCode em um cenário do mundo real, como sanitizar o conteúdo de um post de blog:
+Aqui está um exemplo de como usar o KaririCode Sanitizer em um cenário do mundo real, como a sanitização do conteúdo de uma postagem de blog:
 
 ```php
-<?php
-
-declare(strict_types=1);
-
-require_once __DIR__ . '/../vendor/autoload.php';
-
-use KaririCode\ProcessorPipeline\ProcessorRegistry;
 use KaririCode\Sanitizer\Attribute\Sanitize;
-use KaririCode\Sanitizer\Processor\Domain\HtmlPurifierSanitizer;
-use KaririCode\Sanitizer\Processor\Domain\MarkdownSanitizer;
-use KaririCode\Sanitizer\Processor\Input\HtmlSpecialCharsSanitizer;
-use KaririCode\Sanitizer\Processor\Input\NormalizeLineBreaksSanitizer;
-use KaririCode\Sanitizer\Processor\Input\StripTagsSanitizer;
-use KaririCode\Sanitizer\Processor\Input\TrimSanitizer;
-use KaririCode\Sanitizer\Processor\Security\XssSanitizer;
-use KaririCode\Sanitizer\Sanitizer;
 
-class PostBlog
+class BlogPost
 {
     #[Sanitize(
         processors: ['trim', 'html_special_chars', 'xss_sanitizer'],
         messages: [
-            'trim' => 'Título foi aparado',
+            'trim' => 'O título foi ajustado',
             'html_special_chars' => 'Caracteres especiais no título foram escapados',
-            'xss_sanitizer' => 'Tentativa de XSS foi removida do título',
+            'xss_sanitizer' => 'Tentativa de XSS removida do título',
         ]
     )]
-    private string $titulo = '';
-
-    #[Sanitize(
-        processors: ['trim', 'normalize_line_breaks'],
-        messages: [
-            'trim' => 'Slug foi aparado',
-            'normalize_line_breaks' => 'Quebras de linha no slug foram normalizadas',
-        ]
-    )]
-    private string $slug = '';
+    private string $title = '';
 
     #[Sanitize(
         processors: ['trim', 'markdown', 'html_purifier'],
         messages: [
-            'trim' => 'Conteúdo foi aparado',
+            'trim' => 'O conteúdo foi ajustado',
             'markdown' => 'Markdown no conteúdo foi processado',
             'html_purifier' => 'HTML no conteúdo foi purificado',
         ]
     )]
-    private string $conteudo = '';
-
-    #[Sanitize(
-        processors: ['trim', 'strip_tags', 'html_special_chars'],
-        messages: [
-            'trim' => 'Nome do autor foi aparado',
-            'strip_tags' => 'Tags HTML foram removidas do nome do autor',
-            'html_special_chars' => 'Caracteres especiais no nome do autor foram escapados',
-        ]
-    )]
-    private string $nomeAutor = '';
+    private string $content = '';
 
     // Getters e setters...
 }
 
-// Configurar o sanitizador
-$registry = new ProcessorRegistry();
-$registry->register('sanitizer', 'trim', new TrimSanitizer());
-$registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
-$registry->register('sanitizer', 'normalize_line_breaks', new NormalizeLineBreaksSanitizer());
-$registry->register('sanitizer', 'strip_tags', new StripTagsSanitizer());
-$registry->register('sanitizer', 'markdown', new MarkdownSanitizer());
-$registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
+// Exemplo de uso
+$blogPost = new BlogPost();
+$blogPost->setTitle("  Explorando o KaririCode: Um Framework PHP Moderno <script>alert('xss')</script>  ");
+$blogPost->setContent("# Introdução
+KaririCode é um framework PHP **poderoso** e _flexível_ projetado para o desenvolvimento web moderno.");
 
-// Configurar HTML Purifier com configurações específicas para conteúdo de blog
-$htmlPurifier = new HtmlPurifierSanitizer();
-$htmlPurifier->configure([
-    'allowedTags' => ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'a', 'img', 'h2', 'h3', 'blockquote'],
-    'allowedAttributes' => ['href' => ['a'], 'src' => ['img'], 'alt' => ['img']],
-]);
-$registry->register('sanitizer', 'html_purifier', $htmlPurifier);
-
-$sanitizer = new Sanitizer($registry);
-
-// Simulando submissão de formulário com dados potencialmente inseguros
-$postBlog = new PostBlog();
-$postBlog->setTitulo("  Explorando KaririCode: Um Framework PHP Moderno <script>alert('xss')</script>  ");
-$postBlog->setSlug(" explorando-kariricode-um-framework-php-moderno \r\n");
-$postBlog->setConteudo("
-# Introdução
-
-KaririCode é um framework PHP **poderoso** e _flexível_ projetado para desenvolvimento web moderno.
-
-<script>alert('código malicioso');</script>
-
-## Características Principais
-
-1. Sanitização robusta
-2. Roteamento eficiente
-3. ORM poderoso
-
-Confira nosso [site oficial](https://kariricode.org) para mais informações!
-
-<img src=\"malicioso.jpg\" onerror=\"alert('xss')\" />
-");
-$postBlog->setNomeAutor("<b>João Silva</b> <script>alert('xss')</script>");
-
-$resultado = $sanitizer->sanitize($postBlog);
+$result = $sanitizer->sanitize($blogPost);
 
 // Acessar dados sanitizados
-echo $postBlog->getTitulo(); // Título sanitizado
-echo $postBlog->getConteudo(); // Conteúdo sanitizado
-
-// Acessar detalhes da sanitização
-print_r($resultado['sanitizedValues']);
-print_r($resultado['messages']);
-print_r($resultado['errors']);
+echo $blogPost->getTitle(); // Título sanitizado
+echo $blogPost->getContent(); // Conteúdo sanitizado
 ```
-
-Este exemplo demonstra como usar o Sanitizer do KaririCode para limpar e proteger dados de posts de blog, incluindo o tratamento de conteúdo Markdown, purificação de HTML e proteção contra ataques XSS.
 
 ## Sanitizadores Disponíveis
 
-O componente Sanitizer fornece vários sanitizadores integrados:
-
 ### Sanitizadores de Entrada
 
-- TrimSanitizer: Remove espaços em branco do início e fim de uma string
-- HtmlSpecialCharsSanitizer: Converte caracteres especiais em entidades HTML
-- NormalizeLineBreaksSanitizer: Padroniza quebras de linha entre diferentes sistemas operacionais
-- StripTagsSanitizer: Remove tags HTML e PHP de uma string
+- **TrimSanitizer**: Remove espaços em branco do início e do final de uma string.
+
+  - **Opções de Configuração**:
+    - `characterMask`: Especifica quais caracteres aparar. O padrão é espaço em branco.
+    - `trimLeft`: Booleano para aparar do lado esquerdo. O padrão é `true`.
+    - `trimRight`: Booleano para aparar do lado direito. O padrão é `true`.
+
+- **HtmlSpecialCharsSanitizer**: Converte caracteres especiais em entidades HTML para evitar ataques XSS.
+
+  - **Opções de Configuração**:
+    - `flags`: Flags configuráveis como `ENT_QUOTES | ENT_HTML5`.
+    - `encoding`: Codificação de caracteres, por exemplo, 'UTF-8'.
+    - `doubleEncode`: Booleano para evitar dupla codificação. O padrão é `true`.
+
+- **NormalizeLineBreaksSanitizer**: Padroniza quebras de linha em diferentes sistemas operacionais.
+
+  - **Opções de Configuração**:
+    - `lineEnding`: Especifica o estilo de quebra de linha. Opções: 'unix', 'windows', 'mac'.
+
+- **EmailSanitizer**: Valida e corrige erros comuns de digitação em e-mails, normaliza o formato do e-mail e lida com espaços em branco.
+
+  - **Opções de Configuração**:
+    - `removeMailtoPrefix`: Booleano para remover o prefixo 'mailto:'. O padrão é `false`.
+    - `typoReplacements`: Array associativo de correções de erros de digitação comuns.
+    - `domainReplacements`: Corrige nomes de domínio com erros de digitação comuns.
+
+- **PhoneSanitizer**: Formata e valida números de telefone, incluindo suporte internacional e opções de formatação personalizada.
+
+  - **Opções de Configuração**:
+    - `applyFormat`: Booleano para aplicar formatação. O padrão é `false`.
+    - `format`: Padrão de formatação personalizado para números de telefone.
+    - `placeholder`: Caractere usado como placeholder na formatação.
+
+- **AlphanumericSanitizer**: Remove caracteres não alfanuméricos, com opções configuráveis para permitir certos caracteres especiais.
+
+  - **Opções de Configuração**:
+    - `allowSpace`, `allowUnderscore`, `allowDash`, `allowDot`: Opções booleanas para permitir caracteres específicos.
+    - `preserveCase`: Booleano para manter a sensibilidade a maiúsculas e minúsculas.
+
+- **UrlSanitizer**: Valida e normaliza URLs, garantindo o protocolo e a estrutura adequados.
+
+  - **Opções de Configuração**:
+    - `enforceProtocol`: Impõe um protocolo específico, por exemplo, 'https://'.
+    - `defaultProtocol`: O protocolo a ser aplicado se nenhum estiver presente.
+    - `removeTrailingSlash`: Booleano para remover a barra final.
+
+- **NumericSanitizer**: Garante que a entrada seja um valor numérico, com opções para números decimais e negativos.
+
+  - **Opções de Configuração**:
+    - `allowDecimal`, `allowNegative`: Opções booleanas para permitir decimais e valores negativos.
+    - `decimalSeparator`: Especifica o caractere usado para decimais.
+
+- **StripTagsSanitizer**: Remove tags HTML e PHP da entrada, com opções configuráveis para tags permitidas.
+  - **Opções de Configuração**:
+    - `allowedTags`: Lista de tags HTML a serem mantidas.
+    - `keepSafeAttributes`: Booleano para manter certos atributos seguros.
+    - `safeAttributes`: Array de atributos a serem preservados.
 
 ### Sanitizadores de Domínio
 
-- HtmlPurifierSanitizer: Sanitiza conteúdo HTML usando a biblioteca HTML Purifier
-- JsonSanitizer: Valida e formata strings JSON
-- MarkdownSanitizer: Sanitiza conteúdo Markdown
+- **HtmlPurifierSanitizer**: Sanitiza conteúdo HTML removendo tags e atributos inseguros, garantindo uma renderização segura do HTML.
+
+  - **Opções de Configuração**:
+    - `allowedTags`: Especifica quais tags são permitidas.
+    - `allowedAttributes`: Define atributos permitidos para cada tag.
+    - `removeEmptyTags`, `removeComments`: Booleano para remover tags vazias ou comentários HTML.
+    - `htmlEntities`: Converte caracteres em entidades HTML. O padrão é `true`.
+
+- **JsonSanitizer**: Valida e formata strings JSON, remove caracteres inválidos e garante a estrutura correta do JSON.
+
+  - **Opções de Configuração**:
+    - `prettyPrint`: Booleano para formatar o JSON de forma legível.
+    - `removeInvalidCharacters`: Booleano para remover caracteres inválidos do JSON.
+    - `validateUnicode`: Booleano para validar caracteres Unicode.
+
+- **MarkdownSanitizer**: Processa e sanitiza conteúdo Markdown, escapando caracteres especiais e preservando a estrutura do Markdown.
+  - **Opções de Configuração**:
+    - `allowedElements`: Especifica elementos Markdown permitidos (por exemplo, 'p', 'h1', 'a').
+    - `escapeSpecialCharacters`: Booleano para escapar caracteres especiais como '\*', '\_', etc.
+    - `preserveStructure`: Booleano para manter a formatação Markdown.
 
 ### Sanitizadores de Segurança
 
-- FilenameSanitizer: Garante que nomes de arquivos sejam seguros para uso em sistemas de arquivos
-- SqlInjectionSanitizer: Protege contra ataques de injeção SQL
-- XssSanitizer: Previne ataques de Cross-Site Scripting (XSS)
+- **FilenameSanitizer**: Garante que nomes de arquivos sejam seguros para uso em sistemas de arquivos, removendo caracteres inseguros e validando extensões.
 
-Para informações detalhadas sobre cada sanitizador, incluindo opções de configuração e exemplos de uso, consulte a [documentação](https://kariricode.org/docs/sanitizer).
+  - **Opções de Configuração**:
+    - `replacement`: Caractere usado para substituir caracteres inseguros. O padrão é `'-'`.
+    - `preserveExtension`: Booleano para manter a extensão do arquivo.
+    - `blockDangerousExtensions`: Booleano para bloquear extensões como '.exe', '.js'.
+    - `allowedExtensions`: Array de extensões permitidas.
+
+- **SqlInjectionSanitizer**: Protege contra ataques de injeção de SQL escapando caracteres especiais e removendo conteúdo potencialmente prejudicial.
+
+  - **Opções de Configuração**:
+    - `escapeMap`: Array de caracteres a serem escapados.
+    - `removeComments`: Booleano para remover comentários SQL.
+    - `escapeQuotes`: Booleano para escapar aspas em consultas SQL.
+
+- **XssSanitizer**: Previne ataques de Cross-Site Scripting (XSS) removendo scripts maliciosos, atributos e garantindo uma saída HTML segura.
+  - **Opções de Configuração**:
+    - `removeScripts`: Booleano para remover tags `<script>`.
+    - `removeEventHandlers`: Booleano para remover manipuladores de eventos 'on\*'.
+    - `encodeHtmlEntities`: Booleano para codificar caracteres inseguros.
 
 ## Configuração
 
@@ -261,43 +265,53 @@ $registry->register('sanitizer', 'html_purifier', $htmlPurifier);
 
 Para opções de configuração global, consulte o construtor da classe `Sanitizer`.
 
-## Integração com Outros Componentes KaririCode
+## Integração com Outros Componentes do KaririCode
 
-O componente Sanitizer é projetado para funcionar perfeitamente com outros componentes KaririCode:
+O componente Sanitizer foi projetado para funcionar perfeitamente com outros componentes do KaririCode:
 
 - **KaririCode\Contract**: Fornece interfaces e contratos para integração consistente de componentes.
 - **KaririCode\ProcessorPipeline**: Utilizado para construir e executar pipelines de sanitização.
 - **KaririCode\PropertyInspector**: Usado para analisar e processar propriedades de objetos com atributos de sanitização.
 
-Exemplo de integração:
+## Explicação do Registro
+
+O registro é uma parte central de como os sanitizadores são gerenciados dentro do KaririCode Framework. Ele atua como um local centralizado para registrar e configurar todos os sanitizadores que você planeja usar em sua aplicação.
+
+Veja como você pode criar e configurar o registro:
 
 ```php
-use KaririCode\ProcessorPipeline\ProcessorRegistry;
-use KaririCode\ProcessorPipeline\ProcessorBuilder;
-use KaririCode\PropertyInspector\AttributeAnalyzer;
-use KaririCode\PropertyInspector\AttributeHandler;
-use KaririCode\PropertyInspector\Utility\PropertyInspector;
-use KaririCode\Sanitizer\Sanitizer;
-
+// Criar e configurar o registro
 $registry = new ProcessorRegistry();
-// Registrar sanitizadores...
 
-$builder = new ProcessorBuilder($registry);
-$attributeHandler = new AttributeHandler('sanitizer', $builder);
-$propertyInspector = new PropertyInspector(new AttributeAnalyzer(Sanitize::class));
-
-$sanitizer = new Sanitizer($registry);
+// Registrar todos os processadores necessários
+$registry->register('sanitizer', 'trim', new TrimSanitizer());
+$registry->register('sanitizer', 'html_special_chars', new HtmlSpecialCharsSanitizer());
+$registry->register('sanitizer', 'normalize_line_breaks', new NormalizeLineBreaksSanitizer());
+$registry->register('sanitizer', 'html_purifier', new HtmlPurifierSanitizer());
+$registry->register('sanitizer', 'markdown', new MarkdownSanitizer());
+$registry->register('sanitizer', 'numeric_sanitizer', new NumericSanitizer());
+$registry->register('sanitizer', 'email_sanitizer', new EmailSanitizer());
+$registry->register('sanitizer', 'phone_sanitizer', new PhoneSanitizer());
+$registry->register('sanitizer', 'url_sanitizer', new UrlSanitizer());
+$registry->register('sanitizer', 'alphanumeric_sanitizer', new AlphanumericSanitizer());
+$registry->register('sanitizer', 'filename_sanitizer', new FilenameSanitizer());
+$registry->register('sanitizer', 'json_sanitizer', new JsonSanitizer());
+$registry->register('sanitizer', 'xss_sanitizer', new XssSanitizer());
+$registry->register('sanitizer', 'sql_injection', new SqlInjectionSanitizer());
+$registry->register('sanitizer', 'strip_tags', new StripTagsSanitizer());
 ```
+
+Este código demonstra como registrar vários sanitizadores no registro, permitindo que você gerencie facilmente quais sanitizadores estão disponíveis em toda a sua aplicação. Cada sanitizador recebe um identificador único, que pode ser referenciado em atributos para aplicar regras específicas de sanitização.
 
 ## Desenvolvimento e Testes
 
-Para fins de desenvolvimento e testes, este pacote usa Docker e Docker Compose para garantir consistência em diferentes ambientes. Um Makefile é fornecido para conveniência.
+Para fins de desenvolvimento e testes, este pacote usa Docker e Docker Compose para garantir a consistência entre diferentes ambientes. Um Makefile é fornecido para conveniência.
 
 ### Pré-requisitos
 
 - Docker
 - Docker Compose
-- Make (opcional, mas recomendado para execução mais fácil de comandos)
+- Make (opcional, mas recomendado para facilitar a execução de comandos)
 
 ### Configuração de Desenvolvimento
 
@@ -314,29 +328,30 @@ Para fins de desenvolvimento e testes, este pacote usa Docker e Docker Compose p
    make setup-env
    ```
 
-3. Inicie os containers Docker:
+3. Inicie os contêineres Docker:
 
    ```bash
    make up
    ```
 
 4. Instale as dependências:
+
    ```bash
    make composer-install
    ```
 
-### Comandos Make Disponíveis
+### Comandos Disponíveis do Make
 
 - `make up`: Inicia todos os serviços em segundo plano
-- `make down`: Para e remove todos os containers
-- `make build`: Constrói imagens Docker
-- `make shell`: Acessa o shell do container PHP
-- `make test`: Executa testes
-- `make coverage`: Executa cobertura de testes com formatação visual
-- `make cs-fix`: Executa PHP CS Fixer para corrigir o estilo de código
+- `make down`: Para e remove todos os contêineres
+- `make build`: Constrói as imagens do Docker
+- `make shell`: Acessa o shell do contêiner PHP
+- `make test`: Executa os testes
+- `make coverage`: Executa a cobertura de testes com formatação visual
+- `make cs-fix`: Executa o PHP CS Fixer para corrigir o estilo do código
 - `make quality`: Executa todos os comandos de qualidade (cs-check, test, security-check)
 
-Para uma lista completa de comandos disponíveis, execute:
+Para uma lista completa dos comandos disponíveis, execute:
 
 ```bash
 make help
@@ -344,28 +359,28 @@ make help
 
 ## Contribuindo
 
-Agradecemos contribuições para o componente Sanitizer do KaririCode! Aqui está como você pode contribuir:
+Contribuições ao componente KaririCode Sanitizer são bem-vindas! Veja como você pode contribuir:
 
 1. Faça um fork do repositório
-2. Crie um novo branch para sua feature ou correção de bug
+2. Crie uma nova branch para sua feature ou correção de bug
 3. Escreva testes para suas alterações
 4. Implemente suas alterações
-5. Execute a suite de testes e garanta que todos os testes passem
-6. Envie um pull request com uma descrição clara de suas alterações
+5. Execute a suíte de testes e garanta que todos os testes passem
+6. Envie um pull request com uma descrição clara das suas alterações
 
-Por favor, leia nosso [Guia de Contribuição](CONTRIBUTING.md) para mais detalhes sobre nosso código de conduta e processo de desenvolvimento.
+Leia nosso [Guia de Contribuição](CONTRIBUTING.md) para mais detalhes sobre nosso código de conduta e processo de desenvolvimento.
 
 ## Licença
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ## Suporte e Comunidade
 
 - **Documentação**: [https://kariricode.org/docs/sanitizer](https://kariricode.org/docs/sanitizer)
 - **Rastreador de Problemas**: [GitHub Issues](https://github.com/KaririCode-Framework/kariricode-sanitizer/issues)
-- **Fórum da Comunidade**: [Comunidade KaririCode Club](https://kariricode.club)
+- **Fórum da Comunidade**: [KaririCode Club Community](https://kariricode.club)
 - **Stack Overflow**: Marque suas perguntas com `kariricode-sanitizer`
 
 ---
 
-Construído com ❤️ pela equipe KaririCode. Capacitando desenvolvedores para criar aplicações PHP mais seguras e robustas.
+Construído com ❤️ pela equipe KaririCode. Empoderando desenvolvedores para criar aplicações PHP mais seguras e robustas.
