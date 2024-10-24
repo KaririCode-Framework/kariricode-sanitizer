@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "kariricode/contract",
-            "version": "v2.7.10",
+            "version": "v2.7.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
-                "reference": "84db138e9e03e7173ee1a37d75fa21d756a6d060"
+                "reference": "72c834a3afe2dbded8f6a7f96005635424636d4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/84db138e9e03e7173ee1a37d75fa21d756a6d060",
-                "reference": "84db138e9e03e7173ee1a37d75fa21d756a6d060",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/72c834a3afe2dbded8f6a7f96005635424636d4b",
+                "reference": "72c834a3afe2dbded8f6a7f96005635424636d4b",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-contract"
             },
-            "time": "2024-10-21T18:32:50+00:00"
+            "time": "2024-10-24T18:51:39+00:00"
         },
         {
             "name": "kariricode/data-structure",
@@ -144,16 +144,16 @@
         },
         {
             "name": "kariricode/processor-pipeline",
-            "version": "v1.1.5",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline.git",
-                "reference": "6bc3e747f254c56b5fc0cbdf22b1d3ce1497a7d0"
+                "reference": "58a25f345d066c7d7b69331bdbe1d468513964bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-processor-pipeline/zipball/6bc3e747f254c56b5fc0cbdf22b1d3ce1497a7d0",
-                "reference": "6bc3e747f254c56b5fc0cbdf22b1d3ce1497a7d0",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-processor-pipeline/zipball/58a25f345d066c7d7b69331bdbe1d468513964bf",
+                "reference": "58a25f345d066c7d7b69331bdbe1d468513964bf",
                 "shasum": ""
             },
             "require": {
@@ -199,7 +199,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline"
             },
-            "time": "2024-10-18T18:33:05+00:00"
+            "time": "2024-10-24T18:55:45+00:00"
         },
         {
             "name": "kariricode/property-inspector",
