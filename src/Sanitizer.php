@@ -12,7 +12,6 @@ use KaririCode\PropertyInspector\AttributeHandler;
 use KaririCode\PropertyInspector\Utility\PropertyInspector;
 use KaririCode\Sanitizer\Attribute\Sanitize;
 use KaririCode\Sanitizer\Contract\SanitizationResult;
-use KaririCode\Sanitizer\Contract\SanitizationResultProcessor;
 use KaririCode\Sanitizer\Processor\DefaultSanitizationResultProcessor;
 
 class Sanitizer implements SanitizerContract
@@ -20,25 +19,25 @@ class Sanitizer implements SanitizerContract
     private const IDENTIFIER = 'sanitizer';
 
     private ProcessorBuilder $builder;
-    private PropertyInspector $propertyInspector;
-    private AttributeHandler $attributeHandler;
 
     public function __construct(
-        private readonly ProcessorRegistry $registry,
-        private readonly SanitizationResultProcessor $resultProcessor = new DefaultSanitizationResultProcessor()
+        private readonly ProcessorRegistry $registry
     ) {
         $this->builder = new ProcessorBuilder($this->registry);
-        $this->attributeHandler = new AttributeHandler(self::IDENTIFIER, $this->builder);
-        $this->propertyInspector = new PropertyInspector(
-            new AttributeAnalyzer(Sanitize::class)
-        );
     }
 
     public function sanitize(mixed $object): SanitizationResult
     {
-        $this->propertyInspector->inspect($object, $this->attributeHandler);
-        $this->attributeHandler->applyChanges($object);
+        $attributeHandler = new AttributeHandler(self::IDENTIFIER, $this->builder);
+        $propertyInspector = new PropertyInspector(
+            new AttributeAnalyzer(Sanitize::class)
+        );
 
-        return $this->resultProcessor->process($this->attributeHandler);
+        $propertyInspector->inspect($object, $attributeHandler);
+        $attributeHandler->applyChanges($object);
+
+        $resultProcessor = new DefaultSanitizationResultProcessor();
+
+        return $resultProcessor->process($attributeHandler);
     }
 }

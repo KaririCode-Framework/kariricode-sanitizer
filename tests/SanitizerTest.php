@@ -8,8 +8,6 @@ use KaririCode\Contract\Processor\Processor;
 use KaririCode\Contract\Processor\ProcessorRegistry;
 use KaririCode\Sanitizer\Attribute\Sanitize;
 use KaririCode\Sanitizer\Contract\SanitizationResult;
-use KaririCode\Sanitizer\Contract\SanitizationResultProcessor;
-use KaririCode\Sanitizer\Processor\Input\TrimSanitizer;
 use KaririCode\Sanitizer\Sanitizer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,18 +16,14 @@ final class SanitizerTest extends TestCase
 {
     private Sanitizer $sanitizer;
     private ProcessorRegistry|MockObject $registry;
-    private SanitizationResultProcessor|MockObject $resultProcessor;
-    private SanitizationResult|MockObject $sanitizationResult;
 
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ProcessorRegistry::class);
-        $this->resultProcessor = $this->createMock(SanitizationResultProcessor::class);
-        $this->sanitizationResult = $this->createMock(SanitizationResult::class);
-        $this->sanitizer = new Sanitizer($this->registry, $this->resultProcessor);
+        $this->sanitizer = new Sanitizer($this->registry);
     }
 
-    private function createProcessorMock(string $name, mixed $input, mixed $output): Processor|MockObject
+    private function createProcessorMock(mixed $input, mixed $output): Processor|MockObject
     {
         $processor = $this->createMock(Processor::class);
         $processor->method('process')
@@ -76,14 +70,11 @@ final class SanitizerTest extends TestCase
                 return null;
             });
 
-        $this->resultProcessor->method('process')
-            ->willReturn($this->sanitizationResult);
-
         $result = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('Walmir Silva', $testObject->name);
         $this->assertSame('walmir.silva@example.com', $testObject->email);
-        $this->assertSame($this->sanitizationResult, $result);
+        $this->assertInstanceOf(SanitizationResult::class, $result);
     }
 
     public function testSanitizeHandlesNonProcessableAttributes(): void
@@ -96,7 +87,6 @@ final class SanitizerTest extends TestCase
         };
 
         $trimProcessor = $this->createProcessorMock(
-            'trim',
             '  trim me  ',
             'trim me'
         );
@@ -105,14 +95,11 @@ final class SanitizerTest extends TestCase
             ->with('sanitizer', 'trim')
             ->willReturn($trimProcessor);
 
-        $this->resultProcessor->method('process')
-            ->willReturn($this->sanitizationResult);
-
         $result = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('trim me', $testObject->processable);
         $this->assertSame('leave me alone', $testObject->nonProcessable);
-        $this->assertSame($this->sanitizationResult, $result);
+        $this->assertInstanceOf(SanitizationResult::class, $result);
     }
 
     public function testSanitizeHandlesExceptionsAndUsesFallbackValue(): void
@@ -130,13 +117,10 @@ final class SanitizerTest extends TestCase
             ->with('sanitizer', 'problematic')
             ->willReturn($problematicProcessor);
 
-        $this->resultProcessor->method('process')
-            ->willReturn($this->sanitizationResult);
-
         $result = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('cause problem', $testObject->problematic);
-        $this->assertSame($this->sanitizationResult, $result);
+        $this->assertInstanceOf(SanitizationResult::class, $result);
     }
 
     public function testSanitizeHandlesPrivateAndProtectedProperties(): void
@@ -171,14 +155,11 @@ final class SanitizerTest extends TestCase
             ->with('sanitizer', 'trim')
             ->willReturn($trimProcessor);
 
-        $this->resultProcessor->method('process')
-            ->willReturn($this->sanitizationResult);
-
         $result = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('private', $testObject->getPrivateProp());
         $this->assertSame('protected', $testObject->getProtectedProp());
-        $this->assertSame($this->sanitizationResult, $result);
+        $this->assertInstanceOf(SanitizationResult::class, $result);
     }
 
     public function testSanitizeHandlesMultipleProcessorsForSingleProperty(): void
@@ -189,13 +170,11 @@ final class SanitizerTest extends TestCase
         };
 
         $trimProcessor = $this->createProcessorMock(
-            'trim',
             '  hello world  ',
             'hello world'
         );
 
         $uppercaseProcessor = $this->createProcessorMock(
-            'uppercase',
             'hello world',
             'HELLO WORLD'
         );
@@ -206,12 +185,9 @@ final class SanitizerTest extends TestCase
                 ['sanitizer', 'uppercase', $uppercaseProcessor],
             ]);
 
-        $this->resultProcessor->method('process')
-            ->willReturn($this->sanitizationResult);
-
         $result = $this->sanitizer->sanitize($testObject);
 
         $this->assertSame('HELLO WORLD', $testObject->multiProcessed);
-        $this->assertSame($this->sanitizationResult, $result);
+        $this->assertInstanceOf(SanitizationResult::class, $result);
     }
 }
