@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "kariricode/contract",
-            "version": "v2.7.11",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
-                "reference": "72c834a3afe2dbded8f6a7f96005635424636d4b"
+                "reference": "ee489bbcb44339a246af01058e00b3f94891f66c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/72c834a3afe2dbded8f6a7f96005635424636d4b",
-                "reference": "72c834a3afe2dbded8f6a7f96005635424636d4b",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/ee489bbcb44339a246af01058e00b3f94891f66c",
+                "reference": "ee489bbcb44339a246af01058e00b3f94891f66c",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-contract"
             },
-            "time": "2024-10-24T18:51:39+00:00"
+            "time": "2024-10-25T17:45:25+00:00"
         },
         {
             "name": "kariricode/data-structure",
@@ -143,22 +143,81 @@
             "time": "2024-10-10T22:37:23+00:00"
         },
         {
-            "name": "kariricode/processor-pipeline",
-            "version": "v1.1.6",
+            "name": "kariricode/exception",
+            "version": "v1.2.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline.git",
-                "reference": "58a25f345d066c7d7b69331bdbe1d468513964bf"
+                "url": "https://github.com/KaririCode-Framework/kariricode-exception.git",
+                "reference": "581be984f0f4219266e494dd95accbea0cb63fdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-processor-pipeline/zipball/58a25f345d066c7d7b69331bdbe1d468513964bf",
-                "reference": "58a25f345d066c7d7b69331bdbe1d468513964bf",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-exception/zipball/581be984f0f4219266e494dd95accbea0cb63fdd",
+                "reference": "581be984f0f4219266e494dd95accbea0cb63fdd",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "enlightn/security-checker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.51",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^11.0",
+                "squizlabs/php_codesniffer": "^3.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KaririCode\\Exception\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Walmir Silva",
+                    "email": "community@kariricode.org"
+                }
+            ],
+            "description": "KaririCode Exception provides a robust and modular exception handling system for the KaririCode Framework, enabling seamless error management across various application domains.",
+            "homepage": "https://kariricode.org",
+            "keywords": [
+                "error-management",
+                "exception-handling",
+                "framework",
+                "kariri-code",
+                "modular-exceptions",
+                "php-exceptions",
+                "php-framework"
+            ],
+            "support": {
+                "issues": "https://github.com/KaririCode-Framework/kariricode-exception/issues",
+                "source": "https://github.com/KaririCode-Framework/kariricode-exception"
+            },
+            "time": "2024-10-26T12:56:55+00:00"
+        },
+        {
+            "name": "kariricode/processor-pipeline",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline.git",
+                "reference": "20aeaab04557d61b5c35c1be3e478dd3133d864b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-processor-pipeline/zipball/20aeaab04557d61b5c35c1be3e478dd3133d864b",
+                "reference": "20aeaab04557d61b5c35c1be3e478dd3133d864b",
                 "shasum": ""
             },
             "require": {
                 "kariricode/contract": "^2.7",
                 "kariricode/data-structure": "^1.1",
+                "kariricode/exception": "^1.2",
+                "kariricode/property-inspector": "^1.2",
                 "php": "^8.3"
             },
             "require-dev": {
@@ -199,31 +258,29 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-processor-pipeline"
             },
-            "time": "2024-10-24T18:55:45+00:00"
+            "time": "2024-10-26T14:05:49+00:00"
         },
         {
             "name": "kariricode/property-inspector",
-            "version": "v1.2.0",
+            "version": "v1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-property-inspector.git",
-                "reference": "adab5ba91ac4010745ac1ac3fe03d296d1163d50"
+                "reference": "5faa6ca584ee80fbfc8de456377020703a88ab80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/adab5ba91ac4010745ac1ac3fe03d296d1163d50",
-                "reference": "adab5ba91ac4010745ac1ac3fe03d296d1163d50",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/5faa6ca584ee80fbfc8de456377020703a88ab80",
+                "reference": "5faa6ca584ee80fbfc8de456377020703a88ab80",
                 "shasum": ""
             },
             "require": {
                 "kariricode/contract": "^2.7",
-                "kariricode/processor-pipeline": "^1.1",
                 "php": "^8.3"
             },
             "require-dev": {
                 "enlightn/security-checker": "^2.0",
                 "friendsofphp/php-cs-fixer": "^3.51",
-                "kariricode/validator": "^1.0",
                 "phpstan/phpstan": "^1.10",
                 "phpunit/phpunit": "^11.0",
                 "squizlabs/php_codesniffer": "^3.9"
@@ -264,7 +321,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-property-inspector/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-property-inspector"
             },
-            "time": "2024-10-25T14:57:07+00:00"
+            "time": "2024-10-25T19:50:19+00:00"
         }
     ],
     "packages-dev": [
