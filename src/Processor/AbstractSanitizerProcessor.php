@@ -12,7 +12,7 @@ abstract class AbstractSanitizerProcessor implements Processor
     protected function guardAgainstNonString(mixed $input): string
     {
         if (!is_string($input)) {
-            throw new SanitizationException('Input must be a string');
+            throw SanitizationException::invalidInput('string');
         }
 
         return $input;
