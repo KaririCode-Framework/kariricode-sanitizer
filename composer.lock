@@ -203,16 +203,16 @@
         },
         {
             "name": "kariricode/property-inspector",
-            "version": "v1.1.6",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KaririCode-Framework/kariricode-property-inspector.git",
-                "reference": "7e70c17b74c69601514fa40a4f76aeb0c056e096"
+                "reference": "adab5ba91ac4010745ac1ac3fe03d296d1163d50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/7e70c17b74c69601514fa40a4f76aeb0c056e096",
-                "reference": "7e70c17b74c69601514fa40a4f76aeb0c056e096",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-property-inspector/zipball/adab5ba91ac4010745ac1ac3fe03d296d1163d50",
+                "reference": "adab5ba91ac4010745ac1ac3fe03d296d1163d50",
                 "shasum": ""
             },
             "require": {
@@ -223,6 +223,7 @@
             "require-dev": {
                 "enlightn/security-checker": "^2.0",
                 "friendsofphp/php-cs-fixer": "^3.51",
+                "kariricode/validator": "^1.0",
                 "phpstan/phpstan": "^1.10",
                 "phpunit/phpunit": "^11.0",
                 "squizlabs/php_codesniffer": "^3.9"
@@ -263,7 +264,7 @@
                 "issues": "https://github.com/KaririCode-Framework/kariricode-property-inspector/issues",
                 "source": "https://github.com/KaririCode-Framework/kariricode-property-inspector"
             },
-            "time": "2024-10-21T20:42:58+00:00"
+            "time": "2024-10-25T14:57:07+00:00"
         }
     ],
     "packages-dev": [
