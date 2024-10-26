@@ -16,7 +16,12 @@ trait HtmlCleanerTrait
 
     protected function removeComments(string $input): string
     {
-        return preg_replace('/<!--.*?-->/s', '', $input);
+        // Regular expression that matches the innermost HTML comments first
+        while (preg_match('/<!--[^<]*?-->/', $input)) {
+            $input = preg_replace('/<!--[^<]*?-->/', '', $input);
+        }
+
+        return $input;
     }
 
     protected function removeStyle(string $input): string
