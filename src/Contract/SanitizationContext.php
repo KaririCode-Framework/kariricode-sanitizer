@@ -10,8 +10,8 @@ namespace KaririCode\Sanitizer\Contract;
  * Carries field metadata, parameters, and root data for
  * context-aware sanitization (e.g., locale-dependent formatting).
  *
- * @package KaririCode\Sanitizer\Contract
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 interface SanitizationContext

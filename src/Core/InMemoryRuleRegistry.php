@@ -11,8 +11,8 @@ use KaririCode\Sanitizer\Exception\InvalidRuleException;
 /**
  * In-memory rule registry with alias-to-rule mapping.
  *
- * @package KaririCode\Sanitizer\Core
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final class InMemoryRuleRegistry implements RuleRegistry

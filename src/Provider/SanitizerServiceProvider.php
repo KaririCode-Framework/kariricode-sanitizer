@@ -8,7 +8,6 @@ use KaririCode\Sanitizer\Configuration\SanitizerConfiguration;
 use KaririCode\Sanitizer\Core\AttributeSanitizer;
 use KaririCode\Sanitizer\Core\InMemoryRuleRegistry;
 use KaririCode\Sanitizer\Core\SanitizerEngine;
-use KaririCode\Sanitizer\Contract\RuleRegistry;
 use KaririCode\Sanitizer\Rule\Brazilian;
 use KaririCode\Sanitizer\Rule\Date;
 use KaririCode\Sanitizer\Rule\Filter;
@@ -31,8 +30,8 @@ use KaririCode\Sanitizer\Rule\Type;
 /**
  * Registers all 33 built-in sanitization rules.
  *
- * @package KaririCode\Sanitizer\Provider
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final class SanitizerServiceProvider

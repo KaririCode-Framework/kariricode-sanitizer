@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace KaririCode\Sanitizer\Exception;
 
 /**
- * @package KaririCode\Sanitizer\Exception
  * @since   3.1.0 ARFA 1.3
  */
 final class InvalidRuleException extends \InvalidArgumentException

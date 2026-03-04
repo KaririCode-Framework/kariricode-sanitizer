@@ -7,8 +7,8 @@ namespace KaririCode\Sanitizer\Result;
 /**
  * Result of a sanitization pass — contains sanitized data and modification log.
  *
- * @package KaririCode\Sanitizer\Result
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final class SanitizationResult
@@ -50,8 +50,8 @@ final class SanitizationResult
 
     public function isFieldModified(string $field): bool
     {
-        if (!array_key_exists($field, $this->originalData)) {
-            return array_key_exists($field, $this->sanitizedData);
+        if (! \array_key_exists($field, $this->originalData)) {
+            return \array_key_exists($field, $this->sanitizedData);
         }
 
         return ($this->originalData[$field] ?? null) !== ($this->sanitizedData[$field] ?? null);
@@ -97,7 +97,7 @@ final class SanitizationResult
 
     public function modificationCount(): int
     {
-        return count(array_filter(
+        return \count(array_filter(
             $this->modifications,
             static fn (FieldModification $m): bool => $m->wasModified(),
         ));

@@ -7,8 +7,8 @@ namespace KaririCode\Sanitizer\Contract;
 /**
  * Registry mapping string aliases to SanitizationRule instances.
  *
- * @package KaririCode\Sanitizer\Contract
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 interface RuleRegistry

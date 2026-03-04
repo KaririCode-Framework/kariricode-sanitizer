@@ -13,8 +13,8 @@ namespace KaririCode\Sanitizer\Contract;
  * Unlike ValidationRule (which returns bool), SanitizationRule returns
  * the transformed value — the sanitized output.
  *
- * @package KaririCode\Sanitizer\Contract
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 interface SanitizationRule

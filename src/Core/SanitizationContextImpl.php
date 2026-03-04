@@ -9,8 +9,8 @@ use KaririCode\Sanitizer\Contract\SanitizationContext;
 /**
  * Immutable sanitization context implementation.
  *
- * @package KaririCode\Sanitizer\Core
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final readonly class SanitizationContextImpl implements SanitizationContext

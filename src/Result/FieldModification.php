@@ -7,8 +7,8 @@ namespace KaririCode\Sanitizer\Result;
 /**
  * Records a single modification applied to a field.
  *
- * @package KaririCode\Sanitizer\Result
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final readonly class FieldModification
