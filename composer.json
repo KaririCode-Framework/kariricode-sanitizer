@@ -1,6 +1,6 @@
 {
     "name": "kariricode/sanitizer",
-    "description": "Composable, rule-based data sanitization engine for PHP 8.4+ — 33 rules, #[Sanitize] attributes, XSS prevention, zero dependencies. ARFA 1.3.",
+    "description": "Composable, rule-based data sanitization engine for PHP 8.4+ — 33 rules, #[Sanitize] attributes, XSS prevention, powered by kariricode/property-inspector. ARFA 1.3.",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -20,7 +20,8 @@
     ],
     "homepage": "https://kariricode.org",
     "require": {
-        "php": "^8.4"
+        "php": "^8.4",
+        "kariricode/property-inspector": "^2.0"
     },
     "autoload": {
         "psr-4": {
