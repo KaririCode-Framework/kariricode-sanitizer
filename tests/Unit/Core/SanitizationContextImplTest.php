@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace KaririCode\Sanitizer\Tests\Unit\Core;
 
 use KaririCode\Sanitizer\Core\SanitizationContextImpl;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SanitizationContextImpl::class)]
 final class SanitizationContextImplTest extends TestCase
 {
+    #[Test]
     public function testCreateReturnsEmptyFieldAndEmptyParams(): void
     {
         $ctx = SanitizationContextImpl::create(['a' => 1]);
@@ -18,6 +22,7 @@ final class SanitizationContextImplTest extends TestCase
         $this->assertSame([], $ctx->getParameters());
     }
 
+    #[Test]
     public function testWithFieldReturnsNewInstance(): void
     {
         $ctx = SanitizationContextImpl::create([]);
@@ -28,6 +33,7 @@ final class SanitizationContextImplTest extends TestCase
         $this->assertNotSame($ctx, $ctx2);
     }
 
+    #[Test]
     public function testWithParametersMerges(): void
     {
         $ctx = SanitizationContextImpl::create([])

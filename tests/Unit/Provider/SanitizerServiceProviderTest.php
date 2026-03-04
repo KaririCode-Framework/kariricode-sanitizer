@@ -7,8 +7,11 @@ namespace KaririCode\Sanitizer\Tests\Unit\Provider;
 use KaririCode\Sanitizer\Core\AttributeSanitizer;
 use KaririCode\Sanitizer\Core\SanitizerEngine;
 use KaririCode\Sanitizer\Provider\SanitizerServiceProvider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(SanitizerServiceProvider::class)]
 final class SanitizerServiceProviderTest extends TestCase
 {
     private const EXPECTED_ALIASES = [
@@ -30,9 +33,10 @@ final class SanitizerServiceProviderTest extends TestCase
         'format_cpf', 'format_cnpj', 'format_cep',
     ];
 
+    #[Test]
     public function testRegistersAll33Aliases(): void
     {
-        $registry = (new SanitizerServiceProvider())->createRegistry();
+        $registry = new SanitizerServiceProvider()->createRegistry();
 
         $this->assertCount(33, $registry->aliases());
 
@@ -41,15 +45,17 @@ final class SanitizerServiceProviderTest extends TestCase
         }
     }
 
+    #[Test]
     public function testCreateEngine(): void
     {
-        $engine = (new SanitizerServiceProvider())->createEngine();
+        $engine = new SanitizerServiceProvider()->createEngine();
         $this->assertInstanceOf(SanitizerEngine::class, $engine);
     }
 
+    #[Test]
     public function testCreateAttributeSanitizer(): void
     {
-        $sanitizer = (new SanitizerServiceProvider())->createAttributeSanitizer();
+        $sanitizer = new SanitizerServiceProvider()->createAttributeSanitizer();
         $this->assertInstanceOf(AttributeSanitizer::class, $sanitizer);
     }
 }

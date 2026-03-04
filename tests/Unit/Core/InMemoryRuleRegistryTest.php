@@ -7,10 +7,14 @@ namespace KaririCode\Sanitizer\Tests\Unit\Core;
 use KaririCode\Sanitizer\Core\InMemoryRuleRegistry;
 use KaririCode\Sanitizer\Exception\InvalidRuleException;
 use KaririCode\Sanitizer\Rule\String\TrimRule;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(InMemoryRuleRegistry::class)]
 final class InMemoryRuleRegistryTest extends TestCase
 {
+    #[Test]
     public function testRegisterAndResolve(): void
     {
         $registry = new InMemoryRuleRegistry();
@@ -23,6 +27,7 @@ final class InMemoryRuleRegistryTest extends TestCase
         $this->assertSame(['trim'], $registry->aliases());
     }
 
+    #[Test]
     public function testDuplicateAliasThrows(): void
     {
         $registry = new InMemoryRuleRegistry();
@@ -32,6 +37,7 @@ final class InMemoryRuleRegistryTest extends TestCase
         $registry->register('trim', new TrimRule());
     }
 
+    #[Test]
     public function testUnknownAliasThrows(): void
     {
         $registry = new InMemoryRuleRegistry();

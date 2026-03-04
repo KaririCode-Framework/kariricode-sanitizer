@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace KaririCode\Sanitizer\Tests\Conformance;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Verifies all sanitization rule classes are final readonly
- * and implement SanitizationRule — QD V4.0 ARFA 1.3 compliance.
+ * and implement SanitizationRule — ARFA 1.43 V4.0 conformance.
  */
+#[CoversNothing]
 final class ArchitecturalContractTest extends TestCase
 {
     private const RULE_CLASSES = [
@@ -55,6 +58,7 @@ final class ArchitecturalContractTest extends TestCase
         \KaririCode\Sanitizer\Rule\Brazilian\FormatCepRule::class,
     ];
 
+    #[Test]
     public function testAllRulesAreFinalReadonly(): void
     {
         foreach (self::RULE_CLASSES as $class) {
@@ -64,6 +68,7 @@ final class ArchitecturalContractTest extends TestCase
         }
     }
 
+    #[Test]
     public function testAllRulesImplementContract(): void
     {
         foreach (self::RULE_CLASSES as $class) {
@@ -74,6 +79,7 @@ final class ArchitecturalContractTest extends TestCase
         }
     }
 
+    #[Test]
     public function testRuleCount(): void
     {
         $this->assertCount(33, self::RULE_CLASSES);

@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace KaririCode\Sanitizer\Tests\Integration;
 
 use KaririCode\Sanitizer\Provider\SanitizerServiceProvider;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+#[CoversNothing]
 final class FullRuleRegistrationTest extends TestCase
 {
+    #[Test]
     public function testAllRulesResolvable(): void
     {
-        $registry = (new SanitizerServiceProvider())->createRegistry();
+        $registry = new SanitizerServiceProvider()->createRegistry();
 
         foreach ($registry->aliases() as $alias) {
             $rule = $registry->resolve($alias);
@@ -19,9 +23,10 @@ final class FullRuleRegistrationTest extends TestCase
         }
     }
 
+    #[Test]
     public function testFullPipelineIntegration(): void
     {
-        $engine = (new SanitizerServiceProvider())->createEngine();
+        $engine = new SanitizerServiceProvider()->createEngine();
 
         $result = $engine->sanitize(
             [

@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace KaririCode\Sanitizer\Tests\Conformance;
 
 use KaririCode\Sanitizer\Core\SanitizationContextImpl;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * ARFA 1.3 P1: Immutable State — context.withField() returns new instance.
+ * ARFA 1.43 P1: Immutable State — context mutations return new instances.
  */
+#[CoversClass(SanitizationContextImpl::class)]
 final class ImmutableStateTest extends TestCase
 {
+    #[Test]
     public function testContextWithFieldReturnsNewInstance(): void
     {
         $ctx = SanitizationContextImpl::create(['a' => 1]);
@@ -22,6 +26,7 @@ final class ImmutableStateTest extends TestCase
         $this->assertSame('email', $ctx2->getFieldName());
     }
 
+    #[Test]
     public function testContextWithParametersReturnsNewInstance(): void
     {
         $ctx = SanitizationContextImpl::create([]);
