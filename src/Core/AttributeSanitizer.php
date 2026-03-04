@@ -15,8 +15,8 @@ use KaririCode\Sanitizer\Result\SanitizationResult;
  * Uses kariricode/property-inspector for reflection caching and
  * attribute scanning — eliminates manual ReflectionClass loops.
  *
- * @package KaririCode\Sanitizer\Core
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.2.0 ARFA 1.3
  */
 final readonly class AttributeSanitizer

@@ -13,8 +13,8 @@ use KaririCode\Sanitizer\Attribute\Sanitize;
  * Collects #[Sanitize] rule definitions from each property
  * and writes sanitized values back to the object via PropertyAccessor.
  *
- * @package KaririCode\Sanitizer\Core
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.2.0 ARFA 1.3
  */
 final class SanitizeAttributeHandler implements PropertyAttributeHandler, PropertyChangeApplier
@@ -22,7 +22,7 @@ final class SanitizeAttributeHandler implements PropertyAttributeHandler, Proper
     /** @var array<string, mixed> */
     private array $data = [];
 
-    /** @var array<string, list<mixed>> */
+    /** @var array<string, list<string|\KaririCode\Sanitizer\Contract\SanitizationRule|array{0: string|\KaririCode\Sanitizer\Contract\SanitizationRule, 1: array<string, mixed>}>> */
     private array $fieldRules = [];
 
     /** @var array<string, mixed> */
@@ -31,13 +31,13 @@ final class SanitizeAttributeHandler implements PropertyAttributeHandler, Proper
     #[\Override]
     public function handleAttribute(string $propertyName, object $attribute, mixed $value): mixed
     {
-        if (!$attribute instanceof Sanitize) {
+        if (! $attribute instanceof Sanitize) {
             return null;
         }
 
         $this->data[$propertyName] = $value;
 
-        if (!isset($this->fieldRules[$propertyName])) {
+        if (! isset($this->fieldRules[$propertyName])) {
             $this->fieldRules[$propertyName] = [];
         }
 
@@ -67,7 +67,7 @@ final class SanitizeAttributeHandler implements PropertyAttributeHandler, Proper
         return [];
     }
 
-    /** @return array<string, list<mixed>> */
+    /** @return array<string, list<string|\KaririCode\Sanitizer\Contract\SanitizationRule|array{0: string|\KaririCode\Sanitizer\Contract\SanitizationRule, 1: array<string, mixed>}>> */
     public function getFieldRules(): array
     {
         return $this->fieldRules;
@@ -84,7 +84,7 @@ final class SanitizeAttributeHandler implements PropertyAttributeHandler, Proper
     {
         foreach ($this->processedValues as $property => $value) {
             try {
-                (new PropertyAccessor($object, $property))->setValue($value);
+                new PropertyAccessor($object, $property)->setValue($value);
             } catch (\ReflectionException) {
                 // Property doesn't exist — skip silently
             }

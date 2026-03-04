@@ -6,7 +6,6 @@ namespace KaririCode\Sanitizer\Core;
 
 use KaririCode\Sanitizer\Configuration\SanitizerConfiguration;
 use KaririCode\Sanitizer\Contract\RuleRegistry;
-use KaririCode\Sanitizer\Contract\SanitizationContext;
 use KaririCode\Sanitizer\Contract\SanitizationRule;
 use KaririCode\Sanitizer\Result\FieldModification;
 use KaririCode\Sanitizer\Result\SanitizationResult;
@@ -19,8 +18,8 @@ use KaririCode\Sanitizer\Result\SanitizationResult;
  *
  * Supports dot-notation for nested data access.
  *
- * @package KaririCode\Sanitizer\Core
  * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
  * @since   3.1.0 ARFA 1.3
  */
 final class SanitizerEngine
@@ -34,7 +33,7 @@ final class SanitizerEngine
     /**
      * Sanitize data against field-rule maps.
      *
-     * @param array<string, mixed>                                           $data       Input data
+     * @param array<string, mixed> $data Input data
      * @param array<string, list<string|SanitizationRule|array{0: string|SanitizationRule, 1: array<string, mixed>}>> $fieldRules Per-field rule definitions
      */
     public function sanitize(array $data, array $fieldRules): SanitizationResult
@@ -49,7 +48,7 @@ final class SanitizerEngine
 
             foreach ($rules as $ruleDefinition) {
                 [$rule, $params] = $this->resolveRule($ruleDefinition);
-                $ctx = $params !== [] ? $fieldContext->withParameters($params) : $fieldContext;
+                $ctx = [] !== $params ? $fieldContext->withParameters($params) : $fieldContext;
 
                 $before = $value;
                 $value = $rule->sanitize($value, $ctx);
@@ -77,9 +76,12 @@ final class SanitizerEngine
 
     // ── Dot-Notation Resolution ───────────────────────────────────
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function resolveValue(array $data, string $field): mixed
     {
-        if (array_key_exists($field, $data)) {
+        if (\array_key_exists($field, $data)) {
             return $data[$field];
         }
 
@@ -87,7 +89,7 @@ final class SanitizerEngine
         $current = $data;
 
         foreach ($segments as $segment) {
-            if (!is_array($current) || !array_key_exists($segment, $current)) {
+            if (! \is_array($current) || ! \array_key_exists($segment, $current)) {
                 return null;
             }
             $current = $current[$segment];
@@ -104,6 +106,8 @@ final class SanitizerEngine
     // ── Rule Resolution ───────────────────────────────────────────
 
     /**
+     * @param string|array{0: SanitizationRule|string, 1: array<string, mixed>}|SanitizationRule $definition
+     *
      * @return array{0: SanitizationRule, 1: array<string, mixed>}
      */
     private function resolveRule(string|array|SanitizationRule $definition): array
@@ -112,7 +116,7 @@ final class SanitizerEngine
             return [$definition, []];
         }
 
-        if (is_string($definition)) {
+        if (\is_string($definition)) {
             return [$this->registry->resolve($definition), []];
         }
 
