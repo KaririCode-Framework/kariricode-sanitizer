@@ -4,23 +4,14 @@ declare(strict_types=1);
 
 namespace KaririCode\Sanitizer\Exception;
 
-use KaririCode\Exception\AbstractException;
-
-final class SanitizationException extends AbstractException
+/**
+ * @package KaririCode\Sanitizer\Exception
+ * @since   3.1.0 ARFA 1.3
+ */
+final class SanitizationException extends \RuntimeException
 {
-    private const CODE_INVALID_INPUT = 4001;
-
-    public static function invalidInput(string $expectedType): self
+    public static function engineError(string $message, ?\Throwable $previous = null): self
     {
-        $message = sprintf(
-            'Input must be a %s',
-            $expectedType
-        );
-
-        return self::createException(
-            self::CODE_INVALID_INPUT,
-            'INVALID_INPUT',
-            $message
-        );
+        return new self("Sanitization engine error: {$message}", 0, $previous);
     }
 }
