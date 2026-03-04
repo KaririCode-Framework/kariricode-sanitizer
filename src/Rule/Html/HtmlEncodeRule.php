@@ -17,13 +17,16 @@ final readonly class HtmlEncodeRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $flags = (int) $context->getParameter('flags', ENT_QUOTES | ENT_SUBSTITUTE);
-        $encoding = (string) $context->getParameter('encoding', 'UTF-8');
-        $doubleEncode = (bool) $context->getParameter('double_encode', true);
+        $flagsRaw = $context->getParameter('flags', ENT_QUOTES | ENT_SUBSTITUTE);
+        $flags = \is_int($flagsRaw) ? $flagsRaw : ENT_QUOTES | ENT_SUBSTITUTE;
+        $encodingRaw = $context->getParameter('encoding', 'UTF-8');
+        $encoding = \is_string($encodingRaw) ? $encodingRaw : 'UTF-8';
+        $doubleEncodeRaw = $context->getParameter('double_encode', true);
+        $doubleEncode = \is_bool($doubleEncodeRaw) ? $doubleEncodeRaw : (bool) $doubleEncodeRaw;
 
         return htmlspecialchars($value, $flags, $encoding, $doubleEncode);
     }

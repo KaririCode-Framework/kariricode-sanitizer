@@ -17,13 +17,14 @@ final readonly class StripTagsRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $allowed = (string) $context->getParameter('allowed', '');
+        $allowedRaw = $context->getParameter('allowed', '');
+        $allowed = \is_string($allowedRaw) ? $allowedRaw : '';
 
-        return strip_tags($value, $allowed !== '' ? $allowed : null);
+        return strip_tags($value, '' !== $allowed ? $allowed : null);
     }
 
     #[\Override]

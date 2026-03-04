@@ -17,11 +17,12 @@ final readonly class UrlEncodeRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $raw = (bool) $context->getParameter('raw', false);
+        $rawParam = $context->getParameter('raw', false);
+        $raw = \is_bool($rawParam) ? $rawParam : (bool) $rawParam;
 
         return $raw ? rawurlencode($value) : urlencode($value);
     }

@@ -15,12 +15,14 @@ final readonly class HtmlDecodeRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $flags = (int) $context->getParameter('flags', ENT_QUOTES | ENT_SUBSTITUTE);
-        $encoding = (string) $context->getParameter('encoding', 'UTF-8');
+        $flagsRaw = $context->getParameter('flags', ENT_QUOTES | ENT_SUBSTITUTE);
+        $flags = \is_int($flagsRaw) ? $flagsRaw : ENT_QUOTES | ENT_SUBSTITUTE;
+        $encodingRaw = $context->getParameter('encoding', 'UTF-8');
+        $encoding = \is_string($encodingRaw) ? $encodingRaw : 'UTF-8';
 
         return html_entity_decode($value, $flags, $encoding);
     }
