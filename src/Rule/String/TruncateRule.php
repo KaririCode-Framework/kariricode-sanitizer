@@ -17,12 +17,14 @@ final readonly class TruncateRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $max = (int) $context->getParameter('max', 255);
-        $suffix = (string) $context->getParameter('suffix', '...');
+        $maxRaw = $context->getParameter('max', 255);
+        $max = \is_int($maxRaw) ? $maxRaw : 255;
+        $suffixRaw = $context->getParameter('suffix', '...');
+        $suffix = \is_string($suffixRaw) ? $suffixRaw : '...';
 
         if (mb_strlen($value, 'UTF-8') <= $max) {
             return $value;

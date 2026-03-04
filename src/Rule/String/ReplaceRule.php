@@ -17,18 +17,19 @@ final readonly class ReplaceRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $search = $context->getParameter('search', '');
-        $replace = (string) $context->getParameter('replace', '');
-
-        if ($search === '' || $search === null) {
+        $searchRaw = $context->getParameter('search', '');
+        if (! \is_string($searchRaw) || '' === $searchRaw) {
             return $value;
         }
 
-        return str_replace((string) $search, $replace, $value);
+        $replaceRaw = $context->getParameter('replace', '');
+        $replace = \is_string($replaceRaw) ? $replaceRaw : '';
+
+        return str_replace($searchRaw, $replace, $value);
     }
 
     #[\Override]

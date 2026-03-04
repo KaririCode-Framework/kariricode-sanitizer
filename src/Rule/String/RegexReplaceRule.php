@@ -17,14 +17,16 @@ final readonly class RegexReplaceRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $pattern = (string) $context->getParameter('pattern', '');
-        $replacement = (string) $context->getParameter('replacement', '');
+        $patternRaw = $context->getParameter('pattern', '');
+        $pattern = \is_string($patternRaw) ? $patternRaw : '';
+        $replacementRaw = $context->getParameter('replacement', '');
+        $replacement = \is_string($replacementRaw) ? $replacementRaw : '';
 
-        if ($pattern === '') {
+        if ('' === $pattern) {
             return $value;
         }
 

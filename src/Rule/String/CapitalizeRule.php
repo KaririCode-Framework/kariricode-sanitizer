@@ -15,7 +15,7 @@ final readonly class CapitalizeRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        return is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
+        return \is_string($value) ? mb_convert_case($value, MB_CASE_TITLE, 'UTF-8') : $value;
     }
 
     #[\Override]

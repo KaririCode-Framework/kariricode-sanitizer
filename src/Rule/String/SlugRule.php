@@ -18,11 +18,12 @@ final readonly class SlugRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $separator = (string) $context->getParameter('separator', '-');
+        $separatorRaw = $context->getParameter('separator', '-');
+        $separator = \is_string($separatorRaw) ? $separatorRaw : '-';
 
         // Transliterate common accented characters
         $slug = $this->transliterate($value);

@@ -17,13 +17,16 @@ final readonly class PadRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $length = (int) $context->getParameter('length', 0);
-        $pad = (string) $context->getParameter('pad', ' ');
-        $side = (string) $context->getParameter('side', 'right');
+        $lengthRaw = $context->getParameter('length', 0);
+        $length = \is_int($lengthRaw) ? $lengthRaw : 0;
+        $padRaw = $context->getParameter('pad', ' ');
+        $pad = \is_string($padRaw) ? $padRaw : ' ';
+        $sideRaw = $context->getParameter('side', 'right');
+        $side = \is_string($sideRaw) ? $sideRaw : 'right';
 
         $padType = match ($side) {
             'left' => STR_PAD_LEFT,

@@ -12,11 +12,12 @@ final readonly class TrimRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
-        $characters = (string) $context->getParameter('characters', " \t\n\r\0\x0B");
+        $characters = $context->getParameter('characters', " \t\n\r\0\x0B");
+        $characters = \is_string($characters) ? $characters : " \t\n\r\0\x0B";
 
         return trim($value, $characters);
     }

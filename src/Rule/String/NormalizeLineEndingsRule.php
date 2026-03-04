@@ -15,7 +15,7 @@ final readonly class NormalizeLineEndingsRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        return is_string($value)
+        return \is_string($value)
             ? str_replace(["\r\n", "\r"], "\n", $value)
             : $value;
     }

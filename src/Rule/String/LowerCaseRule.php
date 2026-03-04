@@ -12,7 +12,7 @@ final readonly class LowerCaseRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        return is_string($value) ? mb_strtolower($value, 'UTF-8') : $value;
+        return \is_string($value) ? mb_strtolower($value, 'UTF-8') : $value;
     }
 
     #[\Override]
