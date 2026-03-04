@@ -2,17 +2,19 @@
 
 <div align="center">
 
+[![CI](https://github.com/KaririCode-Framework/kariricode-sanitizer/actions/workflows/ci.yml/badge.svg)](https://github.com/KaririCode-Framework/kariricode-sanitizer/actions/workflows/ci.yml)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](LICENSE)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-4F46E5)](https://phpstan.org/)
-[![Rules](https://img.shields.io/badge/Rules-33-22c55e)](https://kariricode.org)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-22c55e)](composer.json)
-[![ARFA](https://img.shields.io/badge/ARFA-1.3-orange)](https://kariricode.org)
+[![Tests](https://img.shields.io/badge/Tests-175%20passing-22c55e)](https://github.com/KaririCode-Framework/kariricode-sanitizer/actions)
+[![Coverage](https://img.shields.io/badge/Coverage-100%25-22c55e)](https://github.com/KaririCode-Framework/kariricode-sanitizer/actions)
+[![Rules](https://img.shields.io/badge/Rules-33-22c55e)](docs/spec/SPEC-002-rule-reference.md)
+[![ARFA](https://img.shields.io/badge/ARFA-1.43-orange)](https://kariricode.org)
 [![KaririCode Framework](https://img.shields.io/badge/KaririCode-Framework-orange)](https://kariricode.org)
 
 **Composable, rule-based data sanitization engine for PHP 8.4+ — 33 rules, zero dependencies.**
 
-[Installation](#installation) · [Quick Start](#quick-start) · [XSS Prevention](#xss-prevention) · [All Rules](#all-33-rules) · [Architecture](#architecture)
+[Installation](#installation) · [Quick Start](#quick-start) · [Attribute DTO](#attribute-driven-dto-sanitization) · [All Rules](#all-33-rules) · [Architecture](#architecture) · [Docs](docs/README.md)
 
 </div>
 
@@ -27,7 +29,7 @@ Raw user input arrives dirty — whitespace, wrong case, dangerous HTML, unforma
 $name  = ucwords(strtolower(trim($request->name)));
 $email = strtolower(trim($request->email));
 $cpf   = preg_replace('/\D/', '', $request->cpf);
-$input = htmlspecialchars(strip_tags($request->bio));
+$bio   = htmlspecialchars(strip_tags($request->bio));
 
 // No record of what changed, no idempotency guarantee,
 // no attribute-driven DTOs, no composition.
@@ -58,7 +60,7 @@ $result = $engine->sanitize(
 echo $result->get('name');  // "Walmir Silva"
 echo $result->get('email'); // "admin@kariricode.org"
 echo $result->get('cpf');   // "529.982.247-25"
-echo $result->get('bio');   // "&lt;script&gt;alert(...)...Bold"
+echo $result->get('bio');   // "&lt;script&gt;...Bold"
 ```
 
 ---
@@ -95,7 +97,7 @@ $result = $engine->sanitize(
     data: ['name' => '  walmir  SILVA  ', 'email' => '  Admin@Example.ORG  '],
     fieldRules: [
         'name'  => ['trim', 'normalize_whitespace', 'capitalize'],
-        'email' => ['trim', 'lower_case'],
+        'email' => ['trim', 'lower_case', 'email_filter'],
     ],
 );
 
@@ -109,10 +111,11 @@ echo $result->get('email'); // "admin@example.org"
 
 ```php
 use KaririCode\Sanitizer\Attribute\Sanitize;
+use KaririCode\Sanitizer\Provider\SanitizerServiceProvider;
 
 final class CreateUserRequest
 {
-    #[Sanitize('trim', 'lower_case')]
+    #[Sanitize('trim', 'lower_case', 'email_filter')]
     public string $email = '  User@Test.COM  ';
 
     #[Sanitize('trim', 'capitalize')]
@@ -120,10 +123,14 @@ final class CreateUserRequest
 
     #[Sanitize('format_cpf')]
     public string $cpf = '52998224725';
+
+    #[Sanitize(['truncate', ['max' => 200, 'suffix' => '…']])]
+    public string $bio = '';
 }
 
 $sanitizer = (new SanitizerServiceProvider())->createAttributeSanitizer();
-$result    = $sanitizer->sanitize(new CreateUserRequest());
+$dto       = new CreateUserRequest();
+$sanitizer->sanitize($dto);
 
 // $dto->email === 'user@test.com'
 // $dto->name  === 'Walmir Silva'
@@ -149,8 +156,8 @@ $result->modificationCount();  // 2
 foreach ($result->modificationsFor('name') as $mod) {
     echo "{$mod->ruleName}: '{$mod->before}' → '{$mod->after}'\n";
 }
-// string.trim: '  Walmir  ' → 'Walmir'
-// string.upper_case: 'Walmir' → 'WALMIR'
+// trim: '  Walmir  ' → 'Walmir'
+// upper_case: 'Walmir' → 'WALMIR'
 ```
 
 ---
@@ -163,7 +170,8 @@ $result = $engine->sanitize(
     ['input' => ['strip_tags', 'html_encode']],
 );
 // Result: "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;Bold"
-// Or with strip_tags alone: 'alert("xss")Bold'
+// strip_tags alone: 'alert("xss")Bold'
+// html_purify (strip + entity decode + trim): 'Bold'
 ```
 
 ---
@@ -184,38 +192,73 @@ $result = $engine->sanitize(
 
 ## All 33 Rules
 
-| Category | Rules | Aliases |
+| Category | Count | Aliases |
 |---|---|---|
-| **String** (12) | Trim, LowerCase, UpperCase, Capitalize, Slug, Truncate, NormalizeWhitespace, NormalizeLineEndings, Pad, Replace, RegexReplace, StripNonPrintable | `trim`, `lower_case`, `upper_case`, `capitalize`, `slug`, `truncate`, `normalize_whitespace`, `normalize_line_endings`, `pad`, `replace`, `regex_replace`, `strip_non_printable` |
-| **HTML** (5) | StripTags, HtmlEncode, HtmlDecode, HtmlPurify, UrlEncode | `strip_tags`, `html_encode`, `html_decode`, `html_purify`, `url_encode` |
-| **Numeric** (4) | ToInt, ToFloat, Clamp, Round | `to_int`, `to_float`, `clamp`, `round` |
-| **Type** (3) | ToBool, ToString, ToArray | `to_bool`, `to_string`, `to_array` |
-| **Date** (2) | NormalizeDate, TimestampToDate | `normalize_date`, `timestamp_to_date` |
-| **Filter** (4) | DigitsOnly, AlphaOnly, AlphanumericOnly, EmailFilter | `digits_only`, `alpha_only`, `alphanumeric_only`, `email_filter` |
-| **Brazilian** (3) | FormatCPF, FormatCNPJ, FormatCEP | `format_cpf`, `format_cnpj`, `format_cep` |
+| **String** | 12 | `trim`, `lower_case`, `upper_case`, `capitalize`, `slug`, `truncate`, `normalize_whitespace`, `normalize_line_endings`, `pad`, `replace`, `regex_replace`, `strip_non_printable` |
+| **HTML** | 5 | `strip_tags`, `html_encode`, `html_decode`, `html_purify`, `url_encode` |
+| **Numeric** | 4 | `to_int`, `to_float`, `clamp`, `round` |
+| **Type** | 3 | `to_bool`, `to_string`, `to_array` |
+| **Date** | 2 | `normalize_date`, `timestamp_to_date` |
+| **Filter** | 4 | `digits_only`, `alpha_only`, `alphanumeric_only`, `email_filter` |
+| **Brazilian** | 3 | `format_cpf`, `format_cnpj`, `format_cep` |
+
+See [SPEC-002](docs/spec/SPEC-002-rule-reference.md) for full parameter reference.
 
 ---
 
-## Engine API (Programmatic)
+## Rule Parameters
 
 ```php
-$engine = (new SanitizerServiceProvider())->createEngine();
+// truncate — max chars + suffix
+$engine->sanitize(['bio' => $bio], ['bio' => [['truncate', ['max' => 200, 'suffix' => '…']]]]);
 
-$result = $engine->sanitize(
-    ['html' => '<b>test</b>', 'text' => '  spaces  '],
-    ['html' => ['strip_tags', 'trim'], 'text' => ['trim', 'upper_case']],
-);
+// pad — length, pad char, side ('left'|'right'|'both')
+$engine->sanitize(['id' => '7'], ['id' => [['pad', ['length' => 5, 'pad' => '0', 'side' => 'left']]]]);
+// → "00007"
 
-$result->get('html');              // "test"
-$result->get('text');              // "SPACES"
-$result->wasModified();            // true
-$result->modifiedFields();         // ['html', 'text']
-$result->modificationCount();      // 4
+// round — precision and mode ('round'|'ceil'|'floor')
+$engine->sanitize(['price' => 9.9], ['price' => [['round', ['precision' => 2]]]]);
 
-foreach ($result->modificationsFor('html') as $mod) {
-    echo "{$mod->ruleName}: '{$mod->before}' → '{$mod->after}'\n";
+// clamp — min and max bounds
+$engine->sanitize(['age' => 150], ['age' => [['clamp', ['min' => 0, 'max' => 120]]]]);
+
+// normalize_date — from/to format
+$engine->sanitize(['dob' => '25/12/1990'], ['dob' => [['normalize_date', ['from' => 'd/m/Y', 'to' => 'Y-m-d']]]]);
+// → "1990-12-25"
+```
+
+---
+
+## Custom Rules
+
+```php
+use KaririCode\Sanitizer\Contract\SanitizationRule;
+use KaririCode\Sanitizer\Contract\SanitizationContext;
+
+final class PhoneRule implements SanitizationRule
+{
+    public function sanitize(mixed $value, SanitizationContext $context): mixed
+    {
+        if (!is_string($value)) {
+            return $value;   // ARFA passthrough — do not coerce
+        }
+        return preg_replace('/\D/', '', $value) ?? $value;
+    }
+
+    #[\Override]
+    public function getName(): string
+    {
+        return 'phone';
+    }
 }
-// html.strip_tags: '<b>test</b>' → 'test'
+
+// Register and use
+$registry = (new SanitizerServiceProvider())->createRegistry();
+$registry->register('phone', new PhoneRule());
+
+$engine = new SanitizerEngine($registry);
+$result = $engine->sanitize(['phone' => '(85) 99999-9999'], ['phone' => ['phone']]);
+// → "85999999999"
 ```
 
 ---
@@ -228,7 +271,9 @@ Infra Pipeline:   Object ↔ Normalizer ↔ Array ↔ Serializer ↔ String
 Cross-Layer:      Request DTO ↔ Mapper ↔ Domain Entity ↔ Mapper ↔ Response DTO
 ```
 
-The Sanitizer **cleans data** — removes noise while preserving semantic meaning. Key property: idempotency — `sanitize(sanitize(x)) = sanitize(x)`. Contrast with the Transformer, which converts representation and may change type.
+The Sanitizer **cleans data** — removes noise while preserving semantic meaning.
+Key property: idempotency — `sanitize(sanitize(x)) = sanitize(x)`.
+Contrast with the Transformer, which converts representation and may change type.
 
 ---
 
@@ -239,15 +284,20 @@ The Sanitizer **cleans data** — removes noise while preserving semantic meanin
 ```
 src/
 ├── Attribute/       Sanitize — field-level sanitization annotation
-├── Contract/        SanitizationRule · SanitizationContext · SanitizerEngine · Modification
+├── Configuration/   SanitizerConfiguration
+├── Contract/        SanitizationRule · SanitizationContext · RuleRegistry
 ├── Core/            SanitizerEngine · SanitizationContextImpl · InMemoryRuleRegistry
+│                    SanitizeAttributeHandler · AttributeSanitizer
+├── Event/           SanitizationStartedEvent · SanitizationCompletedEvent
 ├── Exception/       SanitizationException · InvalidRuleException
-├── Provider/        SanitizerServiceProvider — factory for engine & attribute sanitizer
+├── Integration/     ProcessorBridge
+├── Provider/        SanitizerServiceProvider
+├── Result/          SanitizationResult · FieldModification
 └── Rule/
     ├── Brazilian/   FormatCPF · FormatCNPJ · FormatCEP
     ├── Date/        NormalizeDate · TimestampToDate
     ├── Filter/      DigitsOnly · AlphaOnly · AlphanumericOnly · EmailFilter
-    ├── HTML/        StripTags · HtmlEncode · HtmlDecode · HtmlPurify · UrlEncode
+    ├── Html/        StripTags · HtmlEncode · HtmlDecode · HtmlPurify · UrlEncode
     ├── Numeric/     ToInt · ToFloat · Clamp · Round
     ├── String/      Trim · LowerCase · UpperCase · Capitalize · Slug · Truncate · …
     └── Type/        ToBool · ToString · ToArray
@@ -257,16 +307,19 @@ src/
 
 | Decision | Rationale | ADR |
 |---|---|---|
-| Idempotency guarantee | `sanitize(sanitize(x)) = sanitize(x)` for all rules | [ADR-001](docs/adr/ADR-001-idempotency.md) |
-| Modification tracking | Full audit trail without extra overhead | [ADR-002](docs/adr/ADR-002-modification-tracking.md) |
-| `final readonly` rules | Immutability, PHPStan L9 | [ADR-003](docs/adr/ADR-003-immutable-rules.md) |
+| Alias-based rule registry | Flat names (`trim`), no FQCN coupling, custom aliases | [ADR-001](docs/adr/ADR-001-rule-registry-pattern.md) |
+| Property Inspector integration | Delegates reflection and caching to `kariricode/property-inspector` | [ADR-002](docs/adr/ADR-002-property-inspector-integration.md) |
+| Immutable `SanitizationContext` | Thread safety, no cross-rule parameter pollution | [ADR-003](docs/adr/ADR-003-sanitization-context-immutability.md) |
+| ARFA passthrough contract | Non-matching types returned unchanged — rules never coerce | [ADR-004](docs/adr/ADR-004-arfa-passthrough-contract.md) |
+| Zero-dependency rules | All 33 rules use only PHP built-ins | [ADR-005](docs/adr/ADR-005-zero-dependency-rules.md) |
 
 ### Specifications
 
 | Spec | Covers |
 |---|---|
-| [SPEC-001](docs/spec/SPEC-001-sanitization-contract.md) | Rule contract and idempotency |
-| [SPEC-002](docs/spec/SPEC-002-modification-tracking.md) | Modification record format |
+| [SPEC-001](docs/spec/SPEC-001-sanitizer-engine.md) | Engine contract, sanitize flow, result API |
+| [SPEC-002](docs/spec/SPEC-002-rule-reference.md) | All 33 rules — aliases, parameters, defaults |
+| [SPEC-003](docs/spec/SPEC-003-attribute-sanitizer.md) | `#[Sanitize]` attribute shape and DTO flow |
 
 ---
 
@@ -274,16 +327,20 @@ src/
 
 | Metric | Value |
 |---|---|
-| PHP source files | 50 |
-| Source lines | 1,913 |
-| Test files | 15 |
-| Test lines | 969 |
-| External runtime dependencies | 1 (kariricode/property-inspector) |
+| PHP source files | 51 |
+| Source lines | ~2,100 |
+| Test files | 20 |
+| Test lines | ~1,938 |
+| Tests | 175 passing |
+| Assertions | 425 |
+| Coverage | 100% (48 classes) |
+| External runtime dependencies | 1 (`kariricode/property-inspector`) |
 | Rule classes | 33 |
 | Rule categories | 7 |
-| PHPStan level | 9 |
+| PHPStan level | 9 (0 errors) |
+| Psalm | 100% type inference (0 errors) |
 | PHP version | 8.4+ |
-| ARFA compliance | 1.3 |
+| ARFA compliance | 1.43 V4.0 |
 
 ---
 
