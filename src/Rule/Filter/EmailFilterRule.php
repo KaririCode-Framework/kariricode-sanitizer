@@ -15,14 +15,14 @@ final readonly class EmailFilterRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
         $value = mb_strtolower(trim($value), 'UTF-8');
-        $filtered = filter_var($value, FILTER_SANITIZE_EMAIL);
 
-        return $filtered !== false ? $filtered : $value;
+        /** @psalm-suppress RedundantCast — PHPStan needs (string) cast; Psalm disagrees on return type */
+        return (string) filter_var($value, FILTER_SANITIZE_EMAIL);
     }
 
     #[\Override]

@@ -17,16 +17,18 @@ final readonly class NormalizeDateRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value) || trim($value) === '') {
+        if (! \is_string($value) || '' === trim($value)) {
             return $value;
         }
 
-        $from = (string) $context->getParameter('from', 'd/m/Y');
-        $to = (string) $context->getParameter('to', 'Y-m-d');
+        $fromRaw = $context->getParameter('from', 'd/m/Y');
+        $from = \is_string($fromRaw) ? $fromRaw : 'd/m/Y';
+        $toRaw = $context->getParameter('to', 'Y-m-d');
+        $to = \is_string($toRaw) ? $toRaw : 'Y-m-d';
 
         $date = \DateTimeImmutable::createFromFormat($from, $value);
 
-        if ($date === false) {
+        if (false === $date) {
             return $value;
         }
 

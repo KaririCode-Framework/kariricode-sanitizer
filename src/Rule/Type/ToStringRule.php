@@ -15,11 +15,11 @@ final readonly class ToStringRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return $value;
         }
 
-        if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+        if (\is_scalar($value) || (\is_object($value) && method_exists($value, '__toString'))) {
             return (string) $value;
         }
 

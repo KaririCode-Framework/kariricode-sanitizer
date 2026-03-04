@@ -15,13 +15,13 @@ final readonly class FormatCnpjRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_string($value)) {
+        if (! \is_string($value)) {
             return $value;
         }
 
         $digits = preg_replace('/\D/', '', $value) ?? '';
 
-        if (strlen($digits) !== 14) {
+        if (14 !== \strlen($digits)) {
             return $value;
         }
 

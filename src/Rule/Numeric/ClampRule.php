@@ -17,20 +17,20 @@ final readonly class ClampRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return $value;
         }
 
-        $numeric = is_int($value) ? $value : (float) $value;
+        $numeric = \is_int($value) ? $value : (float) $value;
         $min = $context->getParameter('min');
         $max = $context->getParameter('max');
 
-        if ($min !== null && is_numeric($min) && $numeric < $min) {
-            return is_int($value) ? (int) $min : (float) $min;
+        if (null !== $min && is_numeric($min) && $numeric < $min) {
+            return \is_int($value) ? (int) $min : (float) $min;
         }
 
-        if ($max !== null && is_numeric($max) && $numeric > $max) {
-            return is_int($value) ? (int) $max : (float) $max;
+        if (null !== $max && is_numeric($max) && $numeric > $max) {
+            return \is_int($value) ? (int) $max : (float) $max;
         }
 
         return $value;

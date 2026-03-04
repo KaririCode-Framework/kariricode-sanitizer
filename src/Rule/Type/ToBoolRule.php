@@ -15,11 +15,11 @@ final readonly class ToBoolRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value;
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return match (strtolower(trim($value))) {
                 '1', 'true', 'yes', 'on' => true,
                 '0', 'false', 'no', 'off', '' => false,

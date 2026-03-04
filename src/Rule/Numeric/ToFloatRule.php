@@ -15,7 +15,7 @@ final readonly class ToFloatRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (is_float($value)) {
+        if (\is_float($value)) {
             return $value;
         }
 

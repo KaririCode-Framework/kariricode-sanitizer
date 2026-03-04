@@ -15,7 +15,7 @@ final readonly class ToIntRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (is_int($value)) {
+        if (\is_int($value)) {
             return $value;
         }
 

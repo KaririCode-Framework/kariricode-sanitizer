@@ -17,15 +17,17 @@ final readonly class TimestampToDateRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return $value;
         }
 
-        $format = (string) $context->getParameter('format', 'Y-m-d H:i:s');
-        $timezone = (string) $context->getParameter('timezone', 'UTC');
+        $formatRaw = $context->getParameter('format', 'Y-m-d H:i:s');
+        $format = \is_string($formatRaw) ? $formatRaw : 'Y-m-d H:i:s';
+        $timezoneRaw = $context->getParameter('timezone', 'UTC');
+        $timezone = (\is_string($timezoneRaw) && '' !== $timezoneRaw) ? $timezoneRaw : 'UTC';
 
         try {
-            $dt = (new \DateTimeImmutable('@' . (int) $value))
+            $dt = new \DateTimeImmutable('@' . (int) $value)
                 ->setTimezone(new \DateTimeZone($timezone));
 
             return $dt->format($format);

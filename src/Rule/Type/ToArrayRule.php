@@ -15,11 +15,11 @@ final readonly class ToArrayRule implements SanitizationRule
     #[\Override]
     public function sanitize(mixed $value, SanitizationContext $context): mixed
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $value;
         }
 
-        if ($value === null) {
+        if (null === $value) {
             return [];
         }
 
