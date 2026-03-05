@@ -64,6 +64,8 @@ tests/lista_de_arquivos_test.php
 lista_de_arquivos.txt
 lista_de_arquivos_tests.txt
 add_static_to_providers.php
+patch_docblocks.php
+patch_docblocks.py
 
 # KaririCode Devkit — generated configs and build artifacts
 .kcode/
