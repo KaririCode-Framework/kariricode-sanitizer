@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Encodes HTML special characters for XSS prevention.
  *
  * Parameters: flags (int, default ENT_QUOTES|ENT_SUBSTITUTE), encoding (string, default 'UTF-8').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class HtmlEncodeRule implements SanitizationRule
 {

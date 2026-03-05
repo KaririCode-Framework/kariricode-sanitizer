@@ -9,6 +9,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
 
 /**
  * Formats a CNPJ number: 11222333000181 → 11.222.333/0001-81.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class FormatCnpjRule implements SanitizationRule
 {

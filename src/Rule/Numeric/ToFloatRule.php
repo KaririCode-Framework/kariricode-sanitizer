@@ -9,6 +9,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
 
 /**
  * Casts a value to float. Non-castable values return as-is.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class ToFloatRule implements SanitizationRule
 {

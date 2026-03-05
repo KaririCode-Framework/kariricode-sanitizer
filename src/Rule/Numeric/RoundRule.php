@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Rounds a numeric value to specified decimal places.
  *
  * Parameters: precision (int, default 2), mode ('round'|'ceil'|'floor', default 'round').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class RoundRule implements SanitizationRule
 {

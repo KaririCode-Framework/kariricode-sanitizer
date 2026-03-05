@@ -9,6 +9,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
 
 /**
  * Casts to boolean. Recognizes '1','true','yes','on' as true, '0','false','no','off' as false.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class ToBoolRule implements SanitizationRule
 {

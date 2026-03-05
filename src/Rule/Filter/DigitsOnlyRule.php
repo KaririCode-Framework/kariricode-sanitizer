@@ -9,6 +9,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
 
 /**
  * Strips all non-digit characters from a string.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class DigitsOnlyRule implements SanitizationRule
 {

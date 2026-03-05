@@ -9,6 +9,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
 
 /**
  * Wraps a non-array value into a single-element array.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class ToArrayRule implements SanitizationRule
 {

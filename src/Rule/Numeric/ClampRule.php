@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Clamps a numeric value to [min, max] bounds.
  *
  * Parameters: min (int|float), max (int|float).
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class ClampRule implements SanitizationRule
 {

@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Normalizes a date string to a standard format.
  *
  * Parameters: from (string, default 'd/m/Y'), to (string, default 'Y-m-d').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class NormalizeDateRule implements SanitizationRule
 {

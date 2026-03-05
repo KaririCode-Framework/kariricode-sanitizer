@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Converts a Unix timestamp to a formatted date string.
  *
  * Parameters: format (string, default 'Y-m-d H:i:s'), timezone (string, default 'UTC').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class TimestampToDateRule implements SanitizationRule
 {
