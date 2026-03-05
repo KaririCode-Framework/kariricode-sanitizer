@@ -12,6 +12,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  *
  * Applies: strip_tags → html_entity_decode → trim.
  * Parameters: allowed (string, tags to preserve).
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class HtmlPurifyRule implements SanitizationRule
 {

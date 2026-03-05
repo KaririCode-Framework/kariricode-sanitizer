@@ -12,6 +12,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  *
  * Transliterates common accented characters, lowercases,
  * replaces non-alphanumeric with hyphens, collapses multiple hyphens.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class SlugRule implements SanitizationRule
 {

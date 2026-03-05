@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Strips HTML/PHP tags from a string.
  *
  * Parameters: allowed (string, e.g. '<b><i><a>').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class StripTagsRule implements SanitizationRule
 {

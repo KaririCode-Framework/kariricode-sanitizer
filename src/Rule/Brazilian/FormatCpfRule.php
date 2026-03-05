@@ -12,6 +12,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  *
  * If the input is already formatted, normalizes it.
  * If the digit count is not 11, returns as-is.
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class FormatCpfRule implements SanitizationRule
 {

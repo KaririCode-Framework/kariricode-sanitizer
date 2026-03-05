@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * URL-encodes a string value.
  *
  * Parameters: raw (bool, default false). If true, uses rawurlencode (RFC 3986).
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class UrlEncodeRule implements SanitizationRule
 {

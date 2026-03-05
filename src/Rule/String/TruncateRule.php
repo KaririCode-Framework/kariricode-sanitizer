@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Truncates a string to a maximum length.
  *
  * Parameters: max (int, default 255), suffix (string, default '...').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class TruncateRule implements SanitizationRule
 {

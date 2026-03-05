@@ -11,6 +11,10 @@ use KaririCode\Sanitizer\Contract\SanitizationRule;
  * Regex-based search-and-replace.
  *
  * Parameters: pattern (string), replacement (string, default '').
+ *
+ * @author  Walmir Silva <walmir.silva@kariricode.org>
+ *
+ * @since   3.1.0 ARFA 1.3
  */
 final readonly class RegexReplaceRule implements SanitizationRule
 {
