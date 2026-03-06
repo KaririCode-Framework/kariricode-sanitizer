@@ -1,6 +1,6 @@
 {
     "name": "kariricode/sanitizer",
-    "description": "Composable, rule-based data sanitization engine for PHP 8.4+ — 33 rules, #[Sanitize] attributes, XSS prevention, powered by kariricode/property-inspector. ARFA 1.3.",
+    "description": "Composable, rule-based data sanitization engine for PHP 8.4+ \u2014 33 rules, #[Sanitize] attributes, XSS prevention, powered by kariricode/property-inspector. ARFA 1.3.",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -10,12 +10,17 @@
         "html",
         "php84",
         "kariricode",
-        "arfa"
+        "arfa",
+        "input-sanitization",
+        "xss-prevention",
+        "property-inspector"
     ],
     "authors": [
         {
             "name": "Walmir Silva",
-            "email": "community@kariricode.org"
+            "email": "walmir.silva@kariricode.org",
+            "homepage": "https://github.com/walmir-silva",
+            "role": "Lead Developer"
         }
     ],
     "homepage": "https://kariricode.org",
@@ -39,8 +44,24 @@
     },
     "support": {
         "issues": "https://github.com/KaririCode-Framework/kariricode-sanitizer/issues",
-        "source": "https://github.com/KaririCode-Framework/kariricode-sanitizer"
+        "source": "https://github.com/KaririCode-Framework/kariricode-sanitizer",
+        "docs": "https://github.com/KaririCode-Framework/kariricode-sanitizer/blob/develop/README.md",
+        "security": "https://github.com/KaririCode-Framework/kariricode-sanitizer/security/advisories/new",
+        "forum": "https://github.com/orgs/KaririCode-Framework/discussions"
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/walmir-silva"
+        }
+    ],
+    "extra": {
+        "arfa": {
+            "level": 1,
+            "conformance": "Structural (P1, P4, P5)",
+            "version": "1.3"
+        }
+    }
 }
